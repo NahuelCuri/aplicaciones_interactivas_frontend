@@ -1,14 +1,16 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import productService from "../services/productService";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import Header from "./Header";
+import useAuth from "../services/useAuth";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
+  const { isAuthenticated, isBuyer } = useAuth();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -41,6 +43,8 @@ const ProductDetail = () => {
       </div>
     );
   }
+
+  const canAddToCart = isAuthenticated && isBuyer;
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
@@ -124,12 +128,20 @@ const ProductDetail = () => {
               </p>
             </div>
 
-            <button className="w-full bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center gap-2 disabled:bg-gray-400"
-              disabled={product.stock === 0}
+            <button 
+              className={`w-full text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2 ${
+                canAddToCart ? 'bg-primary hover:bg-primary/90' : 'bg-primary/50 cursor-not-allowed'
+              }`}
+              disabled={product.stock === 0 || !canAddToCart}
             >
               <span className="material-symbols-outlined">add_shopping_cart</span>
               <span>{product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}</span>
             </button>
+            {!canAddToCart && (
+              <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+                Don't have an account? <Link to="/register" className="text-primary hover:underline">Create one</Link> to start shopping!
+              </p>
+            )}
           </div>
         </div>
       </main>

@@ -1,9 +1,13 @@
 
 import { Link, useNavigate } from 'react-router-dom';
+import useAuth from '../services/useAuth';
+import CartDropdown from './CartDropdown';
+import { useDetectOutsideClick } from '../services/useDetectOutsideClick';
 
 const Header = () => {
-
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { triggerRef, nodeRef, isActive, setIsActive } = useDetectOutsideClick(false);
 
   const handleProfileClick = () => {
     const token = localStorage.getItem('token');
@@ -37,19 +41,72 @@ const Header = () => {
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">search</span>
               <input className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-200 dark:bg-background-dark/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Search products..." type="search" />
             </div>
-            <button className="relative p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
-              <span className="material-symbols-outlined">shopping_cart</span>
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">2</span>
-            </button>
-            <button onClick={handleProfileClick} className="flex items-center">
-              <div
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                style={{
-                  backgroundImage:
-                    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmfGoXjd5ut33wD4coJ-c6GB5UlcPfEeDDyhRa5SoAokqxTyyfqdaGQSyWA_ebNDhkpZDb2wrhlJsmU4lPaAAptL_P_02mT87Ip9Hu9t41Q-D6rd34WYv-fX_BXc3j9b1nDoNd_ZtBQ1yL1mhcTWc-Q_qo2jLA-wyG2DWHztFaeNu4BhB5Ak7V8eMnxofYUlP-v5dKlKURVZhvQ6pclI3Lk-ooBDtrCZ_KAjlOxtPb84sDJiFk0ps5I3zwJN4n7ZJQJIM1cUR-EsF9")',
-                }}
-              ></div>
-            </button>
+           <div className="relative">
+              <button onClick={toggleCart} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
+                <span className="material-symbols-outlined">shopping_cart</span>
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">2</span>
+              </button>
+              {isCartOpen && <CartDropdown />}
+            </div>
+            {isAuthenticated ? (
+              <button onClick={handleProfileClick} className="flex items-center">
+                <div
+                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                  style={{
+                    backgroundImage:
+                      'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmfGoXjd5ut33wD4coJ-c6GB5UlcPfEeDDyhRa5SoAokqxTyyfqdaGQSyWA_ebNDhkpZDb2wrhlJsmU4lPaAAptL_P_02mT87Ip9Hu9t41Q-D6rd34WYv-fX_BXc3j9b1nDoNd_ZtBQ1yL1mhcTWc-Q_qo2jLA-wyG2DWHztFaeNu4BhB5Ak7V8eMnxofYUlP-v5dKlKURVZhvQ6pclI3Lk-ooBDtrCZ_KAjlOxtPb84sDJiFk0ps5I3zwJN4n7ZJQJIM1cUR-EsF9")',
+                  }}
+                ></div>
+              </button>
+            ) : (
+              <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                <strong>Login</strong>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;" fill="currentColor" fillRule="evenodd"></path>
+              </svg>
+              <span>UADE Marketplace</span>
+            </Link>
+            <nav className="hidden md:flex items-center gap-6">
+              <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/">Home</Link>
+              <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/categories">Categories</Link>
+              <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/sell">Sell</Link>
+            </nav>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block relative w-64">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">search</span>
+              <input className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-200 dark:bg-background-dark/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Search products..." type="search" />
+            </div>
+           <div className="relative">
+              <button onClick={toggleCart} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
+                <span className="material-symbols-outlined">shopping_cart</span>
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">2</span>
+              </button>
+              {isCartOpen && <CartDropdown />}
+            </div>
+            {isAuthenticated ? (
+              <button onClick={handleProfileClick} className="flex items-center">
+                <div
+                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                  style={{
+                    backgroundImage:
+                      'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmfGoXjd5ut33wD4coJ-c6GB5UlcPfEeDDyhRa5SoAokqxTyyfqdaGQSyWA_ebNDhkpZDb2wrhlJsmU4lPaAAptL_P_02mT87Ip9Hu9t41Q-D6rd34WYv-fX_BXc3j9b1nDoNd_ZtBQ1yL1mhcTWc-Q_qo2jLA-wyG2DWHztFaeNu4BhB5Ak7V8eMnxofYUlP-v5dKlKURVZhvQ6pclI3Lk-ooBDtrCZ_KAjlOxtPb84sDJiFk0ps5I3zwJN4n7ZJQJIM1cUR-EsF9")',
+                  }}
+                ></div>
+              </button>
+            ) : (
+              <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                <strong>Login</strong>
+              </Link>
+            )}
           </div>
         </div>
       </div>

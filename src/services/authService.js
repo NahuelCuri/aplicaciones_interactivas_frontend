@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4002/auth';
+const API_URL = 'http://localhost:8080/auth';
 
 const login = (email, password) => {
+  console.log('authService.login called with:', { email, password });
   return axios.post(`${API_URL}/authenticate`, {
     email,
     password,

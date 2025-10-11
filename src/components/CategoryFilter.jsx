@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-const CategoryFilter = () => {
+const CategoryFilter = ({ activeCategory, onCategoryChange }) => {
   const [categories, setCategories] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,10 +50,20 @@ const CategoryFilter = () => {
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
           Categories:
         </span>
+        <button
+          onClick={() => onCategoryChange(null)}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            activeCategory === null
+              ? "bg-primary/10 text-primary hover:bg-primary/20 dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-background-dark/50 dark:text-gray-300 dark:hover:bg-background-dark/70"
+          }`}
+        >
+          All
+        </button>
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
+            onClick={() => onCategoryChange(cat.id)}
             className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
               activeCategory === cat.id
                 ? "bg-primary/10 text-primary hover:bg-primary/20 dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30"
