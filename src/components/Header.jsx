@@ -1,23 +1,21 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import CartDropdown from './CartDropdown';
+import UserDropdown from './UserDropdown';
 import { useDetectOutsideClick } from '../services/useDetectOutsideClick';
 import { useCart } from './CartContext';
+import { useState } from 'react';
 
 const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
-  const { triggerRef, nodeRef, isActive, setIsActive } = useDetectOutsideClick(false);
+  const { triggerRef: cartTriggerRef, nodeRef: cartNodeRef, isActive: isCartActive, setIsActive: setIsCartActive } = useDetectOutsideClick(false);
+  const { triggerRef: userTriggerRef, nodeRef: userNodeRef, isActive: isUserActive, setIsActive: setIsUserActive } = useDetectOutsideClick(false);
   const { cart } = useCart();
   const cartItemCount = cart?.items?.length || 0;
 
   const handleProfileClick = () => {
-    const token = sessionStorage.getItem('token');
-    if (token) {
-      navigate('/profile');
-    } else {
-      navigate('/login');
-    }
+    setIsUserActive(!isUserActive);
   };
 
   const handleLogout = () => {
@@ -49,7 +47,7 @@ const Header = () => {
               <input className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-200 dark:bg-background-dark/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Search products..." type="search" />
             </div>
             <div className="relative">
-              <button ref={triggerRef} onClick={() => setIsActive(!isActive)} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
+              <button ref={cartTriggerRef} onClick={() => setIsCartActive(!isCartActive)} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
                 <span className="material-symbols-outlined">shopping_cart</span>
                 {isAuthenticated && cartItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
@@ -57,15 +55,15 @@ const Header = () => {
                   </span>
                 )}
               </button>
-              {isActive && (
-                <div ref={nodeRef}>
+              {isCartActive && (
+                <div ref={cartNodeRef}>
                   <CartDropdown />
                 </div>
               )}
             </div>
             {isAuthenticated ? (
-              <>
-                <button onClick={handleProfileClick} className="flex items-center">
+              <div className="relative">
+                <button ref={userTriggerRef} onClick={handleProfileClick} className="flex items-center">
                   <div
                     className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                     style={{
@@ -74,10 +72,12 @@ const Header = () => {
                     }}
                   ></div>
                 </button>
-                <button onClick={handleLogout} className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
-                  <strong>Logout</strong>
-                </button>
-              </>
+                {isUserActive && (
+                  <div ref={userNodeRef} className="transition-all duration-300 ease-in-out">
+                    <UserDropdown />
+                  </div>
+                )}
+              </div>
             ) : (
               <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
                 <strong>Login</strong>
