@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextInput from './TextInput';
 import authService from '../services/authService';
+import { useAuth } from '../services/AuthContext';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -10,10 +11,10 @@ const LoginForm = () => {
   const [validationError, setValidationError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login form submitted');
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,15 +26,9 @@ const LoginForm = () => {
 
     setError('');
     setLoading(true);
-    console.log('Attempting to log in with:', { email, password });
     try {
       const response = await authService.login(email, password);
-      console.log('Login successful:', response.data);
-
-      // Store both token and user data
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-
+      login(response.data.user, response.data.access_token);
       navigate('/');
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
@@ -84,10 +79,7 @@ const LoginForm = () => {
             autoComplete="current-password"
             required
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              console.log('Password input:', e.target.value);
-            }}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
       </div>

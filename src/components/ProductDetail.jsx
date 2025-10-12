@@ -4,13 +4,15 @@ import productService from "../services/productService";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import Header from "./Header";
-import useAuth from "../services/useAuth";
+import { useAuth } from "../services/AuthContext";
+import { useCart } from "./CartContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const { isAuthenticated, isBuyer } = useAuth();
+  const { addItemToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -25,6 +27,13 @@ const ProductDetail = () => {
 
     fetchProduct();
   }, [id]);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addItemToCart(product.id, 1);
+      console.log(`Added ${product.name} to cart`);
+    }
+  };
 
   if (error) {
     return (
@@ -130,9 +139,10 @@ const ProductDetail = () => {
 
             <button 
               className={`w-full text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2 ${
-                canAddToCart ? 'bg-primary hover:bg-primary/90' : 'bg-primary/50 cursor-not-allowed'
+                canAddToCart ? 'bg-primary hover:bg-primary/90 cursor-pointer' : 'bg-primary/50 cursor-not-allowed'
               }`}
               disabled={product.stock === 0 || !canAddToCart}
+              onClick={handleAddToCart}
             >
               <span className="material-symbols-outlined">add_shopping_cart</span>
               <span>{product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}</span>

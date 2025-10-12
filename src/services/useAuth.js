@@ -1,19 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useContext } from 'react';
+import { AuthContext } from './AuthContext';
 
 const useAuth = () => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const isAuthenticated = !!user;
-  const isBuyer = user?.roles?.includes('BUYER');
-
-  return { user, isAuthenticated, isBuyer };
+  return useContext(AuthContext);
 };
 
 export default useAuth;

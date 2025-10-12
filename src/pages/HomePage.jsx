@@ -20,7 +20,6 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10; // 👈 cantidad de productos por página
 
-  // Fetch all products once
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -38,7 +37,6 @@ const HomePage = () => {
     fetchProducts();
   }, []);
 
-  // Apply filters when filters or allProducts change
   useEffect(() => {
     let products = [...allProducts];
 

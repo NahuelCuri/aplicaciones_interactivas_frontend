@@ -1,20 +1,28 @@
 import { Link, useNavigate } from 'react-router-dom';
-import useAuth from '../services/useAuth';
+import { useAuth } from '../services/AuthContext';
 import CartDropdown from './CartDropdown';
 import { useDetectOutsideClick } from '../services/useDetectOutsideClick';
+import { useCart } from './CartContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { triggerRef, nodeRef, isActive, setIsActive } = useDetectOutsideClick(false);
+  const { cart } = useCart();
+  const cartItemCount = cart?.items?.length || 0;
 
   const handleProfileClick = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       navigate('/profile');
     } else {
       navigate('/login');
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -43,7 +51,11 @@ const Header = () => {
             <div className="relative">
               <button ref={triggerRef} onClick={() => setIsActive(!isActive)} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
                 <span className="material-symbols-outlined">shopping_cart</span>
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">2</span>
+                {isAuthenticated && cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
+                    {cartItemCount}
+                  </span>
+                )}
               </button>
               {isActive && (
                 <div ref={nodeRef}>
@@ -52,15 +64,20 @@ const Header = () => {
               )}
             </div>
             {isAuthenticated ? (
-              <button onClick={handleProfileClick} className="flex items-center">
-                <div
-                  className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                  style={{
-                    backgroundImage:
-                      'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmfGoXjd5ut33wD4coJ-c6GB5UlcPfEeDDyhRa5SoAokqxTyyfqdaGQSyWA_ebNDhkpZDb2wrhlJsmU4lPaAAptL_P_02mT87Ip9Hu9t41Q-D6rd34WYv-fX_BXc3j9b1nDoNd_ZtBQ1yL1mhcTWc-Q_qo2jLA-wyG2DWHztFaeNu4BhB5Ak7V8eMnxofYUlP-v5dKlKURVZhvQ6pclI3Lk-ooBDtrCZ_KAjlOxtPb84sDJiFk0ps5I3zwJN4n7ZJQJIM1cUR-EsF9")',
-                  }}
-                ></div>
-              </button>
+              <>
+                <button onClick={handleProfileClick} className="flex items-center">
+                  <div
+                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                    style={{
+                      backgroundImage:
+                        'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmfGoXjd5ut33wD4coJ-c6GB5UlcPfEeDDyhRa5SoAokqxTyyfqdaGQSyWA_ebNDhkpZDb2wrhlJsmU4lPaAAptL_P_02mT87Ip9Hu9t41Q-D6rd34WYv-fX_BXc3j9b1nDoNd_ZtBQ1yL1mhcTWc-Q_qo2jLA-wyG2DWHztFaeNu4BhB5Ak7V8eMnxofYUlP-v5dKlKURVZhvQ6pclI3Lk-ooBDtrCZ_KAjlOxtPb84sDJiFk0ps5I3zwJN4n7ZJQJIM1cUR-EsF9")',
+                    }}
+                  ></div>
+                </button>
+                <button onClick={handleLogout} className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                  <strong>Logout</strong>
+                </button>
+              </>
             ) : (
               <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
                 <strong>Login</strong>
