@@ -27,9 +27,14 @@ const updateCartItemQuantity = (productId, quantity) => {
   return axios.put(`${API_URL}/cart/items/${productId}`, { quantity }, getAuthHeaders());
 };
 
+const getOrdersByUser = (buyerId) => {
+  return axios.get(`${API_URL}/users/${buyerId}/orders`, getAuthHeaders());
+};
+
 export default {
   getCart,
   addItemToCart,
   removeItemFromCart,
   updateCartItemQuantity,
+  getOrdersByUser,
 };

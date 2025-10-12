@@ -1,37 +1,34 @@
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
-
-// Mock data - replace with actual API calls
-const mockUser = {
-  name: "Sophia Clark",
-  email: "sophia.clark@email.com",
-  avatar: "https://i.pravatar.cc/150?u=sophia.clark@email.com",
-};
-
-const mockOrders = [
-  { id: "#12345", date: "2024-01-15", status: "Shipped", total: "$50.00" },
-  { id: "#67890", date: "2023-12-20", status: "Delivered", total: "$75.00" },
-  { id: "#11223", date: "2023-11-05", status: "Cancelled", total: "$25.00" },
-  { id: "#44556", date: "2023-10-10", status: "Delivered", total: "$100.00" },
-  { id: "#77889", date: "2023-09-25", status: "Shipped", total: "$60.00" },
-];
+import { useAuth } from "../services/AuthContext";
+import orderService from "../services/orderService";
 
 const statusColors = {
   Shipped: "bg-blue-100/80 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
   Delivered: "bg-green-100/80 text-green-800 dark:bg-green-900/50 dark:text-green-200",
   Cancelled: "bg-red-100/80 text-red-800 dark:bg-red-900/50 dark:text-red-200",
+  PENDING: "bg-yellow-100/80 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200",
 };
 
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    // TODO: Fetch user and order data from your backend
-    setUser(mockUser);
-    setOrders(mockOrders);
-  }, []);
+    const fetchOrders = async () => {
+      if (user && user.id) {
+        try {
+          const response = await orderService.getOrdersByUser(user.id);
+          setOrders(response.data);
+        } catch (error) {
+          console.error("Failed to fetch orders:", error);
+        }
+      }
+    };
+
+    fetchOrders();
+  }, [user]);
 
   if (!user) {
     return (
@@ -59,9 +56,9 @@ const ProfilePage = () => {
 
             <div className="rounded-xl border border-gray-200/80 dark:border-gray-700/50 bg-white/50 dark:bg-background-dark/50 p-6 shadow-sm">
               <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-                <img alt="User profile picture" className="h-24 w-24 rounded-full" src={user.avatar} />
+                <img alt="User profile picture" className="h-24 w-24 rounded-full" src={`https://i.pravatar.cc/150?u=${user.email}`} />
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{user.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{user.username}</h3>
                   <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
                 </div>
                 <button className="flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
@@ -85,14 +82,14 @@ const ProfilePage = () => {
                   <tbody className="divide-y divide-gray-200/50 dark:divide-gray-700/50">
                     {orders.map((order) => (
                       <tr key={order.id}>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{order.id}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{order.date}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">#{order.id}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[order.status]}`}>
                             {order.status}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">{order.total}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">${order.totalPrice.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
