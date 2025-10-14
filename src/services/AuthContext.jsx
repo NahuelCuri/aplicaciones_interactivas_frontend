@@ -26,9 +26,10 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
   const isBuyer = user?.roles?.includes('BUYER');
+  const isSeller = user?.roles?.includes('SELLER');
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isBuyer, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isBuyer, isSeller, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

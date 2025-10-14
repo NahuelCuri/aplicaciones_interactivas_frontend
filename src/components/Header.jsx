@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, isSeller } = useAuth();
   const { triggerRef: cartTriggerRef, nodeRef: cartNodeRef, isActive: isCartActive, setIsActive: setIsCartActive } = useDetectOutsideClick(false);
   const { triggerRef: userTriggerRef, nodeRef: userNodeRef, isActive: isUserActive, setIsActive: setIsUserActive } = useDetectOutsideClick(false);
   const { cart } = useCart();
@@ -37,8 +37,7 @@ const Header = () => {
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/">Home</Link>
-              <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/categories">Categories</Link>
-              <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/sell">Sell</Link>
+              {isSeller && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/my-products">My products</Link>}
             </nav>
           </div>
           <div className="flex items-center gap-4">

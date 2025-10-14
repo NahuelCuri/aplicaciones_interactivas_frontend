@@ -14,10 +14,30 @@ const getProductsByCategory = (categoryId) => {
   return axios.get(`${API_URL}/category/${categoryId}`);
 };
 
+const getSellerProducts = () => {
+  const token = sessionStorage.getItem('token');
+  return axios.get(`${API_URL}/my-products`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+};
+
+const searchSellerProducts = (name) => {
+  const token = sessionStorage.getItem('token');
+  return axios.get(`${API_URL}/my-products/search?name=${name}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+};
+
 const productService = {
   getAllProducts,
   getProductById,
   getProductsByCategory,
+  getSellerProducts,
+  searchSellerProducts,
 };
 
 export default productService;

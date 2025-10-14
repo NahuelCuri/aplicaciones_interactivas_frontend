@@ -19,6 +19,11 @@ const RegisterPage = () => {
             Login
           </Link>
         </p>
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <Link className="font-medium text-primary hover:text-primary/80" to="/">
+            I don't want an account!
+          </Link>
+        </p>
       </div>
     </div>
   );

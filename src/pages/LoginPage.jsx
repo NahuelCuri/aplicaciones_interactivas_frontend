@@ -1,5 +1,6 @@
 import LoginForm from '../components/LoginForm';
 import Logo from '../components/Logo';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   return (
@@ -15,9 +16,14 @@ const LoginPage = () => {
         </div>
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{' '}
-          <a className="font-medium text-primary hover:text-primary/80" href="/register">
+          <Link className="font-medium text-primary hover:text-primary/80" to="/register">
             Sign up
-          </a>
+          </Link>
+        </p>
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <Link className="font-medium text-primary hover:text-primary/80" to="/">
+            I don't want an account!
+          </Link>
         </p>
       </div>
     </div>
