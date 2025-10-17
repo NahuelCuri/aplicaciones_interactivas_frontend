@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import TextInput from './TextInput';
+import useAuth from '../services/useAuth';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
@@ -8,6 +10,8 @@ const RegisterForm = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +21,10 @@ const RegisterForm = () => {
     }
     try {
       await authService.register(username, email, password, 'BUYER');
-      // Redirect to login page or dashboard
+      const response = await authService.login(email, password);
+      const { accessToken, user } = response.data;
+      login(user, accessToken);
+      navigate('/');
     } catch (err) {
       setError('Failed to register');
     }

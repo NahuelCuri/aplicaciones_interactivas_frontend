@@ -87,10 +87,10 @@ const ProductDetail = () => {
             </div>
 
             <Carousel showArrows={true} showThumbs={true} infiniteLoop={true} useKeyboardArrows={true} autoPlay={true}>
-              {product.imagesBase64 && product.imagesBase64.length > 0 ? (
-                product.imagesBase64.map((imageBase64, index) => (
+              {product.images && product.images.length > 0 ? (
+                product.images.map((image, index) => (
                   <div key={index}>
-                    <img src={`data:image/jpeg;base64,${imageBase64}`} alt={`Product image ${index + 1}`} />
+                    <img src={`data:image/jpeg;base64,${image.content}`} alt={`Product image ${index + 1}`} />
                   </div>
                 ))
               ) : (
