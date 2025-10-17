@@ -51,6 +51,16 @@ const deleteProduct = (id) => {
   });
 };
 
+const createProduct = (data) => {
+  const token = sessionStorage.getItem('token');
+  return axios.post(API_URL, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
+
 const productService = {
   getAllProducts,
   getProductById,
@@ -59,6 +69,7 @@ const productService = {
   searchSellerProducts,
   updateProduct,
   deleteProduct,
+  createProduct,
 };
 
 export default productService;

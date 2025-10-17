@@ -5,6 +5,7 @@ import productService from '../services/productService';
 import Pagination from '../components/Pagination';
 import EditProductModal from '../components/EditProductModal';
 import ConfirmationModal from '../components/ConfirmationModal';
+import AddProductModal from '../components/AddProductModal';
 
 const SellerProductList = () => {
   const [products, setProducts] = useState([]);
@@ -16,6 +17,7 @@ const SellerProductList = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleOpenEditModal = (product) => {
     productService.getProductById(product.id)
@@ -41,6 +43,14 @@ const SellerProductList = () => {
   const handleCloseConfirmModal = () => {
     setProductToDelete(null);
     setIsConfirmModalOpen(false);
+  };
+
+  const handleOpenAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
   };
 
   const handleDeleteProduct = () => {
@@ -118,7 +128,7 @@ const SellerProductList = () => {
                     </button>
                   )}
                 </div>
-                <button className="flex items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white gap-2 text-base font-bold shadow-sm hover:bg-opacity-90 transition-colors whitespace-nowrap min-w-[160px] cursor-pointer">
+                <button onClick={handleOpenAddModal} className="flex items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white gap-2 text-base font-bold shadow-sm hover:bg-opacity-90 transition-colors whitespace-nowrap min-w-[160px] cursor-pointer">
                   <span className="material-symbols-outlined">add_circle</span>
                   <span>New Product</span>
                 </button>
@@ -161,6 +171,12 @@ const SellerProductList = () => {
           message={`Are you sure you want to delete "${productToDelete?.name}"?`}
           onConfirm={handleDeleteProduct}
           onCancel={handleCloseConfirmModal}
+        />
+      )}
+      {isAddModalOpen && (
+        <AddProductModal
+          onClose={handleCloseAddModal}
+          onProductCreate={handleProductUpdate}
         />
       )}
     </div>
