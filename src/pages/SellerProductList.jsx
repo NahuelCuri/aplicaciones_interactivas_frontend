@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import { useState, useEffect, useRef } from 'react';
 import productService from '../services/productService';
 import Pagination from '../components/Pagination';
+import EditProductModal from '../components/EditProductModal';
 
 const SellerProductList = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,34 @@ const SellerProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
   const searchInputRef = useRef(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleOpenEditModal = (product) => {
+    productService.getProductById(product.id)
+      .then(response => {
+        setSelectedProduct(response.data);
+        setIsEditModalOpen(true);
+      })
+      .catch(error => {
+        console.error('Error fetching product details:', error);
+      });
+  };
+
+  const handleCloseEditModal = () => {
+    setSelectedProduct(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleProductUpdate = () => {
+    productService.getSellerProducts()
+      .then(response => {
+        setProducts(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching seller products:', error);
+      });
+  };
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -81,7 +110,7 @@ const SellerProductList = () => {
                       <p className="text-primary text-lg font-bold">${product.finalPrice}</p>
                     </div>
                     <div className="flex gap-2 mt-4 sm:mt-0">
-                      <button className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-gray-100 text-text-primary text-sm font-medium hover:bg-gray-200 transition-colors">Edit</button>
+                      <button onClick={() => handleOpenEditModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-gray-100 text-text-primary text-sm font-medium hover:bg-gray-200 transition-colors">Edit</button>
                       <button className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-red-500/10 text-red-500 text-sm font-medium hover:bg-red-500/20 transition-colors">Delete</button>
                     </div>
                   </div>
@@ -96,6 +125,13 @@ const SellerProductList = () => {
           </div>
         </main>
       </div>
+      {isEditModalOpen && (
+        <EditProductModal
+          product={selectedProduct}
+          onClose={handleCloseEditModal}
+          onProductUpdate={handleProductUpdate}
+        />
+      )}
     </div>
   );
 };

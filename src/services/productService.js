@@ -32,12 +32,23 @@ const searchSellerProducts = (name) => {
   });
 };
 
+const updateProduct = (id, data) => {
+  const token = sessionStorage.getItem('token');
+  return axios.put(`${API_URL}/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};
+
 const productService = {
   getAllProducts,
   getProductById,
   getProductsByCategory,
   getSellerProducts,
   searchSellerProducts,
+  updateProduct,
 };
 
 export default productService;
