@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import productService from '../services/productService';
 import Pagination from '../components/Pagination';
 import EditProductModal from '../components/EditProductModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const SellerProductList = () => {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,8 @@ const SellerProductList = () => {
   const searchInputRef = useRef(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const handleOpenEditModal = (product) => {
     productService.getProductById(product.id)
@@ -28,6 +31,27 @@ const SellerProductList = () => {
   const handleCloseEditModal = () => {
     setSelectedProduct(null);
     setIsEditModalOpen(false);
+  };
+
+  const handleOpenConfirmModal = (product) => {
+    setProductToDelete(product);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleCloseConfirmModal = () => {
+    setProductToDelete(null);
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleDeleteProduct = () => {
+    productService.deleteProduct(productToDelete.id)
+      .then(() => {
+        handleProductUpdate();
+        handleCloseConfirmModal();
+      })
+      .catch(error => {
+        console.error('Error deleting product:', error);
+      });
   };
 
   const handleProductUpdate = () => {
@@ -94,9 +118,9 @@ const SellerProductList = () => {
                     </button>
                   )}
                 </div>
-                <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white gap-2 text-base font-bold shadow-sm hover:bg-opacity-90 transition-colors">
+                <button className="flex items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white gap-2 text-base font-bold shadow-sm hover:bg-opacity-90 transition-colors whitespace-nowrap min-w-[160px] cursor-pointer">
                   <span className="material-symbols-outlined">add_circle</span>
-                  <span className="truncate">Add New Product</span>
+                  <span>New Product</span>
                 </button>
               </div>
             </div>
@@ -110,8 +134,8 @@ const SellerProductList = () => {
                       <p className="text-primary text-lg font-bold">${product.finalPrice}</p>
                     </div>
                     <div className="flex gap-2 mt-4 sm:mt-0">
-                      <button onClick={() => handleOpenEditModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-gray-100 text-text-primary text-sm font-medium hover:bg-gray-200 transition-colors">Edit</button>
-                      <button className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-red-500/10 text-red-500 text-sm font-medium hover:bg-red-500/20 transition-colors">Delete</button>
+                      <button onClick={() => handleOpenEditModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-gray-100 text-text-primary text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer">Edit</button>
+                      <button onClick={() => handleOpenConfirmModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-red-500/10 text-red-500 text-sm font-medium hover:bg-red-500/20 transition-colors cursor-pointer">Delete</button>
                     </div>
                   </div>
                 </div>
@@ -130,6 +154,13 @@ const SellerProductList = () => {
           product={selectedProduct}
           onClose={handleCloseEditModal}
           onProductUpdate={handleProductUpdate}
+        />
+      )}
+      {isConfirmModalOpen && (
+        <ConfirmationModal
+          message={`Are you sure you want to delete "${productToDelete?.name}"?`}
+          onConfirm={handleDeleteProduct}
+          onCancel={handleCloseConfirmModal}
         />
       )}
     </div>
