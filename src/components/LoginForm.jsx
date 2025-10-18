@@ -28,8 +28,14 @@ const LoginForm = () => {
     setLoading(true);
     try {
       const response = await authService.login(email, password);
-      login(response.data.user, response.data.access_token);
-      navigate('/');
+      const { user, access_token } = response.data;
+      login(user, access_token);
+
+      if (user.roles.includes('ADMIN')) {
+        navigate('/admin/users');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
       console.error(err);

@@ -9,6 +9,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import SellerProductList from "./pages/SellerProductList";
 import BecomeSellerPage from "./pages/BecomeSellerPage";
 import UserAdminPage from "./pages/UserAdminPage";
+import CategoryAdminPage from "./pages/CategoryAdminPage";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/my-products" element={<SellerProductList />} />
         <Route path="/become-seller" element={<BecomeSellerPage />} />
         <Route path="/admin/users" element={<UserAdminPage />} />
+        <Route path="/admin/categories" element={<CategoryAdminPage />} />
       </Routes>
     </Router>
   );

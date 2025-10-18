@@ -20,9 +20,8 @@ const RegisterForm = () => {
       return;
     }
     try {
-      await authService.register(username, email, password, 'BUYER');
-      const response = await authService.login(email, password);
-      const { accessToken, user } = response.data;
+      const response = await authService.register(username, email, password, 'BUYER');
+      const { access_token: accessToken, user } = response.data;
       login(user, accessToken);
       navigate('/');
     } catch (err) {

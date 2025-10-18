@@ -4,6 +4,20 @@ const EditUserModal = ({ user, onClose, onSave }) => {
   const [username, setUsername] = useState(user.username);
   const [email, setEmail] = useState(user.email);
   const [roles, setRoles] = useState(user.roles.map(role => role.name));
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!username) {
+      newErrors.username = "Username is required";
+    }
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is not valid";
+    }
+    return newErrors;
+  };
 
   const handleRoleChange = (role) => {
     setRoles(prevRoles => 
@@ -14,6 +28,11 @@ const EditUserModal = ({ user, onClose, onSave }) => {
   };
 
   const handleSave = () => {
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     onSave(user.id, { username, email, roles });
   };
 
@@ -32,19 +51,21 @@ const EditUserModal = ({ user, onClose, onSave }) => {
             <label className="flex flex-col">
               <p className="text-base font-medium text-gray-900 dark:text-white pb-2">Username</p>
               <input 
-                className="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-12 px-3"
+                className={`form-input w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-12 px-3 ${errors.username ? 'border-red-500' : ''}`}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
             </label>
             <label className="flex flex-col">
               <p className="text-base font-medium text-gray-900 dark:text-white pb-2">Email</p>
               <input 
-                className="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-12 px-3"
+                className={`form-input w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary focus:border-primary h-12 px-3 ${errors.email ? 'border-red-500' : ''}`}
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </label>
             <div>
               <p className="text-base font-medium text-gray-900 dark:text-white pb-2">Roles</p>

@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout, isSeller, isAdmin } = useAuth();
+  const { isAuthenticated, logout, isSeller, isAdmin, isBuyer } = useAuth();
   const { triggerRef: cartTriggerRef, nodeRef: cartNodeRef, isActive: isCartActive, setIsActive: setIsCartActive } = useDetectOutsideClick(false);
   const { triggerRef: userTriggerRef, nodeRef: userNodeRef, isActive: isUserActive, setIsActive: setIsUserActive } = useDetectOutsideClick(false);
   const { cart } = useCart();
@@ -36,16 +36,13 @@ const Header = () => {
               <span>UADE Marketplace</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/">Home</Link>
-              {isSeller && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/my-products">My products</Link>}
+              {isBuyer && !isAdmin && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/">Home</Link>}
+              {isSeller && !isAdmin && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/my-products">My products</Link>}
               {isAdmin && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/admin/users">User Administration</Link>}
+              {isAdmin && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/admin/categories">Category Administration</Link>}
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden md:block relative w-64">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">search</span>
-              <input className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-200 dark:bg-background-dark/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Search products..." type="search" />
-            </div>
             <div className="relative">
               <button ref={cartTriggerRef} onClick={() => setIsCartActive(!isCartActive)} className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors">
                 <span className="material-symbols-outlined">shopping_cart</span>
@@ -79,9 +76,14 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <Link to="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
-                <strong>Login</strong>
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link to="/login" className="px-4 py-2 rounded-lg bg-primary text-white font-bold text-sm hover:bg-opacity-90 transition-colors">
+                  Login
+                </Link>
+                <Link to="/register" className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 font-bold text-sm hover:bg-gray-300 transition-colors">
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -90,4 +92,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export { Header as default };
