@@ -13,6 +13,18 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const { isAuthenticated, isBuyer } = useAuth();
   const { addItemToCart } = useCart();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -55,8 +67,44 @@ const ProductDetail = () => {
 
   const canAddToCart = isAuthenticated && isBuyer;
 
+  const customStyles = `
+    .carousel .thumbs-wrapper {
+      margin: 20px 0;
+    }
+
+    .carousel .thumb {
+      width: 60px !important;
+      height: 60px !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+      border: 3px solid transparent !important;
+      transition: border-color 0.2s;
+    }
+
+    .carousel .thumb.selected, .carousel .thumb:hover {
+      border-color: #A0AEC0 !important;
+    }
+
+    .carousel .thumb img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+
+    .carousel .control-arrow {
+      background-color: #A0AEC0 !important;
+      opacity: 0.8 !important;
+      transition: opacity 0.2s;
+    }
+
+    .carousel .control-arrow:hover {
+      opacity: 1 !important;
+    }
+  `;
+
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+      <style>{customStyles}</style>
       <Header />
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -89,8 +137,8 @@ const ProductDetail = () => {
             <Carousel showArrows={true} showThumbs={true} infiniteLoop={true} useKeyboardArrows={true} autoPlay={true}>
               {product.images && product.images.length > 0 ? (
                 product.images.map((image, index) => (
-                  <div key={index}>
-                    <img src={`data:image/jpeg;base64,${image.content}`} alt={`Product image ${index + 1}`} />
+                  <div key={index} onClick={() => openModal(image.content)}>
+                    <img src={`data:image/jpeg;base64,${image.content}`} alt={`Product image ${index + 1}`} className="h-96 w-full object-contain cursor-pointer" />
                   </div>
                 ))
               ) : (
@@ -155,6 +203,14 @@ const ProductDetail = () => {
           </div>
         </div>
       </main>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeModal}>
+          <div className="relative max-w-4xl max-h-4xl" onClick={(e) => e.stopPropagation()}>
+            <img src={`data:image/jpeg;base64,${selectedImage}`} alt="Enlarged product" className="w-full h-full object-contain" />
+            <button onClick={closeModal} className="absolute top-0 right-0 m-4 text-white text-2xl">&times;</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

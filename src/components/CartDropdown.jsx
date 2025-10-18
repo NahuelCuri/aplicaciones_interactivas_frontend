@@ -26,7 +26,7 @@ const CartDropdown = () => {
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {cart.items.map((item) => (
               <div key={item.product.id} className="flex items-center py-4">
-                <img alt={item.product.name} className="h-16 w-16 rounded-lg object-cover" src={item.product.imageUrl} />
+                <img alt={item.product.name} className="h-16 w-16 rounded-lg object-cover" src={item.product.mainImageBase64 ? `data:image/jpeg;base64,${item.product.mainImageBase64}` : ''} />
                 <div className="ml-4 flex-1">
                   <p className="font-medium text-gray-900 dark:text-white">{item.product.name}</p>
 

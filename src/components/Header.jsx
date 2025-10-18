@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout, isSeller } = useAuth();
+  const { isAuthenticated, logout, isSeller, isAdmin } = useAuth();
   const { triggerRef: cartTriggerRef, nodeRef: cartNodeRef, isActive: isCartActive, setIsActive: setIsCartActive } = useDetectOutsideClick(false);
   const { triggerRef: userTriggerRef, nodeRef: userNodeRef, isActive: isUserActive, setIsActive: setIsUserActive } = useDetectOutsideClick(false);
   const { cart } = useCart();
@@ -38,6 +38,7 @@ const Header = () => {
             <nav className="hidden md:flex items-center gap-6">
               <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/">Home</Link>
               {isSeller && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/my-products">My products</Link>}
+              {isAdmin && <Link className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" to="/admin/users">User Administration</Link>}
             </nav>
           </div>
           <div className="flex items-center gap-4">
