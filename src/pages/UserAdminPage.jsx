@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Header from "../components/Header";
 import userService from "../services/userService";
 import EditUserModal from "../components/EditUserModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
@@ -79,7 +78,6 @@ const UserAdminPage = () => {
 
   return (
     <div className="flex h-screen flex-col">
-      <Header />
       <main className="flex-1 overflow-y-auto p-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex items-center justify-between">

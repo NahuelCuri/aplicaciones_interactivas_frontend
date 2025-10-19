@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
 import { useState, useEffect, useRef } from 'react';
 import productService from '../services/productService';
 import Pagination from '../components/Pagination';
@@ -106,7 +105,6 @@ const SellerProductList = () => {
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-      <Header />
       <div className="layout-container flex h-full grow flex-col">
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 max-w-7xl mx-auto w-full">
           <div className="layout-content-container flex flex-col gap-8">

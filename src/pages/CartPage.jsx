@@ -1,4 +1,3 @@
-import Header from "../components/Header";
 import CartItem from "../components/CartItem";
 import OrderSummary from "../components/OrderSummary";
 import { useCart } from "../components/CartContext";
@@ -8,7 +7,6 @@ const CartPage = () => {
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col">
-      <Header />
       <main className="flex flex-1 justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Your Cart</h2>

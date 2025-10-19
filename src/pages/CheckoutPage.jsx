@@ -1,4 +1,3 @@
-import Header from "../components/Header";
 import ShippingForm from "../components/ShippingForm";
 import PaymentForm from "../components/PaymentForm";
 import CheckoutOrderSummary from "../components/CheckoutOrderSummary";
@@ -6,7 +5,6 @@ import CheckoutOrderSummary from "../components/CheckoutOrderSummary";
 const CheckoutPage = () => {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="container mx-auto flex-1 px-4 py-8">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">

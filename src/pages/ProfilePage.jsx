@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
 import { useAuth } from "../services/AuthContext";
 import orderService from "../services/orderService";
 
@@ -32,20 +31,17 @@ const ProfilePage = () => {
 
   if (!user) {
     return (
-      <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <Header />
-        <main className="flex-1">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <p>Loading profile...</p>
-          </div>
-        </main>
-      </div>
-    );
+          <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+            <main className="flex-1">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+                <p>Loading profile...</p>
+              </div>
+            </main>
+          </div>    );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-col gap-10">

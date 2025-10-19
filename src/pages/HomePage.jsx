@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
 import ProductCard from "../components/ProductCard";
 import CategoryFilter from "../components/CategoryFilter";
 import Pagination from "../components/Pagination";
@@ -73,7 +72,6 @@ const HomePage = () => {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-      <Header />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CategoryFilter
           activeCategory={filters.category}

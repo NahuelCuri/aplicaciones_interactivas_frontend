@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import userService from '../services/userService';
 import { useAuth } from '../services/AuthContext';
 
@@ -21,7 +20,6 @@ const BecomeSellerPage = () => {
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-      <Header />
       <main className="flex-1 flex flex-col items-center justify-center py-10 sm:py-16">
         <div className="flex flex-col gap-6 p-4 w-full max-w-4xl">
           <div className="flex flex-col gap-3 text-center">

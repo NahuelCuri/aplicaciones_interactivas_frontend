@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import productService from "../services/productService";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import Header from "./Header";
 import { useAuth } from "../services/AuthContext";
 import { useCart } from "./CartContext";
 
@@ -49,20 +48,16 @@ const ProductDetail = () => {
 
   if (error) {
     return (
-      <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <Header />
-        <p className="text-center py-10 text-red-500">Error loading product.</p>
-      </div>
-    );
+          <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+            <p className="text-center py-10 text-red-500">Error loading product.</p>
+          </div>    );
   }
 
   if (!product) {
     return (
-      <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <Header />
-        <p className="text-center py-10">Loading product...</p>
-      </div>
-    );
+          <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+            <p className="text-center py-10">Loading product...</p>
+          </div>    );
   }
 
   const canAddToCart = isAuthenticated && isBuyer;
@@ -105,7 +100,6 @@ const ProductDetail = () => {
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
       <style>{customStyles}</style>
-      <Header />
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* IMAGES */}
