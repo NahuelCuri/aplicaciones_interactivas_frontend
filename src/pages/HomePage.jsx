@@ -17,7 +17,7 @@ const HomePage = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10; // 👈 cantidad de productos por página
+  const pageSize = 10; 
 
   useEffect(() => {
     const fetchProducts = async () => {
