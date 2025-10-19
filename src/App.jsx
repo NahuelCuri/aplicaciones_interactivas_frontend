@@ -11,6 +11,7 @@ import SellerProductList from "./pages/SellerProductList";
 import BecomeSellerPage from "./pages/BecomeSellerPage";
 import UserAdminPage from "./pages/UserAdminPage";
 import CategoryAdminPage from "./pages/CategoryAdminPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
           <Route path="/become-seller" element={<BecomeSellerPage />} />
           <Route path="/admin/users" element={<UserAdminPage />} />
           <Route path="/admin/categories" element={<CategoryAdminPage />} />
+          <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

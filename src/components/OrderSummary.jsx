@@ -1,8 +1,7 @@
 const OrderSummary = ({ cart }) => {
   const subtotal = cart?.items?.reduce((acc, item) => acc + item.priceAtPurchase * item.quantity, 0) || 0;
   const shipping = 0; // Assuming free shipping for now
-  const taxes = subtotal * 0.05; // Assuming 5% tax
-  const total = subtotal + shipping + taxes;
+  const total = subtotal + shipping;
 
   return (
     <div className="bg-white dark:bg-background-dark rounded-lg shadow p-6">
@@ -15,10 +14,6 @@ const OrderSummary = ({ cart }) => {
         <div className="flex justify-between text-sm">
           <span className="text-gray-600 dark:text-gray-300">Shipping</span>
           <span className="font-medium text-gray-900 dark:text-white">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600 dark:text-gray-300">Taxes</span>
-          <span className="font-medium text-gray-900 dark:text-white">${taxes.toFixed(2)}</span>
         </div>
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>

@@ -31,10 +31,15 @@ const getOrdersByUser = (buyerId) => {
   return axios.get(`${API_URL}/users/${buyerId}/orders`, getAuthHeaders());
 };
 
+const checkout = () => {
+  return axios.post(`${API_URL}/checkout`, {}, getAuthHeaders());
+};
+
 export default {
   getCart,
   addItemToCart,
   removeItemFromCart,
   updateCartItemQuantity,
   getOrdersByUser,
+  checkout,
 };

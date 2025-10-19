@@ -1,8 +1,25 @@
+import { useNavigate } from 'react-router-dom';
 import ShippingForm from "../components/ShippingForm";
 import PaymentForm from "../components/PaymentForm";
 import CheckoutOrderSummary from "../components/CheckoutOrderSummary";
+import orderService from '../services/orderService';
+import { useCart } from '../components/CartContext';
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
+  const { fetchCart } = useCart();
+
+  const handlePlaceOrder = async () => {
+    try {
+      const order = await orderService.checkout();
+      fetchCart(); // to refresh the cart
+      navigate(`/order-confirmation/${order.data.id}`);
+    } catch (error) {
+      console.error('Failed to place order', error);
+      // Handle error, e.g., show a notification
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <main className="container mx-auto flex-1 px-4 py-8">
@@ -22,7 +39,10 @@ const CheckoutPage = () => {
             </div>
             <div className="space-y-6">
               <CheckoutOrderSummary />
-              <button className="w-full rounded-lg bg-primary py-4 text-center font-bold text-white transition hover:bg-primary/90">
+              <button
+                onClick={handlePlaceOrder}
+                className="w-full rounded-lg bg-primary py-4 text-center font-bold text-white transition hover:bg-primary/90"
+              >
                 Place Order
               </button>
             </div>
