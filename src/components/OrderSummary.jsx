@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 const OrderSummary = ({ cart }) => {
   const navigate = useNavigate();
   const subtotal = cart?.items?.reduce((acc, item) => acc + item.priceAtPurchase * item.quantity, 0) || 0;
-  const shipping = 0; // Assuming free shipping for now
+  const shipping = 0;
   const total = subtotal + shipping;
 
   const handleCheckout = () => {
