@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateProduct } from '../app/features/products/productsSlice';
 import categoryService from '../services/categoryService';
-import productService from '../services/productService';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
-const EditProductModal = ({ product, onClose, onProductUpdate }) => {
+const EditProductModal = ({ product, onClose }) => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState(product);
   const [categories, setCategories] = useState([]);
   const [newImages, setNewImages] = useState([]);
@@ -74,7 +76,7 @@ const EditProductModal = ({ product, onClose, onProductUpdate }) => {
     setNewImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     const productData = new FormData();
     productData.append('name', formData.name);
     productData.append('description', formData.description);
@@ -91,14 +93,12 @@ const EditProductModal = ({ product, onClose, onProductUpdate }) => {
       productData.append('imagesToDelete', imageId);
     });
 
-    productService.updateProduct(product.id, productData)
-      .then(() => {
-        onProductUpdate();
-        onClose();
-      })
-      .catch(error => {
-        console.error('Error updating product:', error);
-      });
+    try {
+      await dispatch(updateProduct({ id: product.id, data: productData })).unwrap();
+      onClose();
+    } catch (error) {
+      console.error('Failed to update product:', error);
+    }
   };
 
   if (!product) return null;

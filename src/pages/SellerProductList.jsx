@@ -1,37 +1,61 @@
-import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import productService from '../services/productService';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  fetchSellerProducts,
+  searchSellerProducts,
+  deleteProduct,
+  fetchProductById,
+  clearSelectedProduct,
+} from '../app/features/products/productsSlice';
 import Pagination from '../components/Pagination';
 import EditProductModal from '../components/EditProductModal';
 import ConfirmationModal from '../components/ConfirmationModal';
 import AddProductModal from '../components/AddProductModal';
 
 const SellerProductList = () => {
-  const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
+  const {
+    sellerProducts,
+    sellerStatus,
+    selectedProduct,
+    selectedProductStatus,
+  } = useSelector((state) => state.products);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
   const searchInputRef = useRef(null);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchTerm) {
+        dispatch(searchSellerProducts(searchTerm));
+      } else {
+        dispatch(fetchSellerProducts());
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, dispatch]);
+
+  useEffect(() => {
+    if (selectedProductStatus === 'succeeded') {
+      setIsEditModalOpen(true);
+    }
+  }, [selectedProductStatus]);
+
   const handleOpenEditModal = (product) => {
-    productService.getProductById(product.id)
-      .then(response => {
-        setSelectedProduct(response.data);
-        setIsEditModalOpen(true);
-      })
-      .catch(error => {
-        console.error('Error fetching product details:', error);
-      });
+    dispatch(fetchProductById(product.id));
   };
 
   const handleCloseEditModal = () => {
-    setSelectedProduct(null);
     setIsEditModalOpen(false);
+    dispatch(clearSelectedProduct());
   };
 
   const handleOpenConfirmModal = (product) => {
@@ -53,55 +77,15 @@ const SellerProductList = () => {
   };
 
   const handleDeleteProduct = () => {
-    productService.deleteProduct(productToDelete.id)
-      .then(() => {
-        handleProductUpdate();
-        handleCloseConfirmModal();
-      })
-      .catch(error => {
-        console.error('Error deleting product:', error);
-      });
+    dispatch(deleteProduct(productToDelete.id));
+    handleCloseConfirmModal();
   };
-
-  const handleProductUpdate = () => {
-    productService.getSellerProducts()
-      .then(response => {
-        setProducts(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching seller products:', error);
-      });
-  };
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchTerm) {
-        productService.searchSellerProducts(searchTerm)
-          .then(response => {
-            setProducts(response.data);
-          })
-          .catch(error => {
-            console.error('Error searching seller products:', error);
-          });
-      } else {
-        productService.getSellerProducts()
-          .then(response => {
-            setProducts(response.data);
-          })
-          .catch(error => {
-            console.error('Error fetching seller products:', error);
-          });
-      }
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = sellerProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const totalPages = Math.ceil(sellerProducts.length / productsPerPage);
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
@@ -132,23 +116,27 @@ const SellerProductList = () => {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-4">
-              {currentProducts.map(product => (
-                <div key={product.id} className="flex flex-col sm:flex-row items-center gap-4 rounded-xl bg-surface p-4 border border-gray-200/80 hover:border-primary/50 transition-all shadow-sm hover:shadow-lg">
-                  <div className="w-full sm:w-32 h-32 sm:h-24 sm:min-w-24 bg-center bg-no-repeat bg-cover rounded-lg" style={{ backgroundImage: `url(data:image/jpeg;base64,${product.mainImageBase64})` }}></div>
-                  <div className="flex-1 flex flex-col sm:flex-row items-center justify-between w-full">
-                    <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
-                      <p className="text-text-primary text-lg font-bold">{product.name}</p>
-                      <p className="text-primary text-lg font-bold">${product.finalPrice}</p>
-                    </div>
-                    <div className="flex gap-2 mt-4 sm:mt-0">
-                      <button onClick={() => handleOpenEditModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-gray-100 text-text-primary text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer">Edit</button>
-                      <button onClick={() => handleOpenConfirmModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-red-500/10 text-red-500 text-sm font-medium hover:bg-red-500/20 transition-colors cursor-pointer">Delete</button>
+            {sellerStatus === 'loading' && <p>Loading...</p>}
+            {sellerStatus === 'succeeded' && (
+              <div className="flex flex-col gap-4">
+                {currentProducts.map(product => (
+                  <div key={product.id} className="flex flex-col sm:flex-row items-center gap-4 rounded-xl bg-surface p-4 border border-gray-200/80 hover:border-primary/50 transition-all shadow-sm hover:shadow-lg">
+                    <div className="w-full sm:w-32 h-32 sm:h-24 sm:min-w-24 bg-center bg-no-repeat bg-cover rounded-lg" style={{ backgroundImage: `url(data:image/jpeg;base64,${product.mainImageBase64})` }}></div>
+                    <div className="flex-1 flex flex-col sm:flex-row items-center justify-between w-full">
+                      <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
+                        <p className="text-text-primary text-lg font-bold">{product.name}</p>
+                        <p className="text-primary text-lg font-bold">${product.finalPrice}</p>
+                      </div>
+                      <div className="flex gap-2 mt-4 sm:mt-0">
+                        <button onClick={() => handleOpenEditModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-gray-100 text-text-primary text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer">Edit</button>
+                        <button onClick={() => handleOpenConfirmModal(product)} className="flex-1 flex items-center justify-center h-10 px-4 rounded-md bg-red-500/10 text-red-500 text-sm font-medium hover:bg-red-500/20 transition-colors cursor-pointer">Delete</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+            {sellerStatus === 'failed' && <p>Failed to load products.</p>}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -157,11 +145,10 @@ const SellerProductList = () => {
           </div>
         </main>
       </div>
-      {isEditModalOpen && (
+      {isEditModalOpen && selectedProduct && (
         <EditProductModal
           product={selectedProduct}
           onClose={handleCloseEditModal}
-          onProductUpdate={handleProductUpdate}
         />
       )}
       {isConfirmModalOpen && (
@@ -174,7 +161,6 @@ const SellerProductList = () => {
       {isAddModalOpen && (
         <AddProductModal
           onClose={handleCloseAddModal}
-          onProductCreate={handleProductUpdate}
         />
       )}
     </div>

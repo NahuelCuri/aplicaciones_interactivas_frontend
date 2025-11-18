@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { createProduct } from '../app/features/products/productsSlice';
 import categoryService from '../services/categoryService';
-import productService from '../services/productService';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
-const AddProductModal = ({ onClose, onProductCreate }) => {
+const AddProductModal = ({ onClose }) => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
   const [categories, setCategories] = useState([]);
   const [newImages, setNewImages] = useState([]);
@@ -60,7 +62,7 @@ const AddProductModal = ({ onClose, onProductCreate }) => {
     setNewImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleCreateProduct = () => {
+  const handleCreateProduct = async () => {
     if (!formData.categoryId) {
       alert('Please select a category.');
       return;
@@ -78,14 +80,12 @@ const AddProductModal = ({ onClose, onProductCreate }) => {
       productData.append('images', image);
     });
 
-    productService.createProduct(productData)
-      .then(() => {
-        onProductCreate();
-        onClose();
-      })
-      .catch(error => {
-        console.error('Error creating product:', error);
-      });
+    try {
+      await dispatch(createProduct(productData)).unwrap();
+      onClose();
+    } catch (error) {
+      console.error('Failed to create product:', error);
+    }
   };
 
   return (
