@@ -5,56 +5,38 @@ import CategoryFilter from "../components/CategoryFilter";
 import Pagination from "../components/Pagination";
 import Filter from "../components/Filter";
 import { fetchProducts } from "../app/features/products/productsSlice";
+import { setFilter } from "../app/features/filters/filterSlice";
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const allProducts = useSelector((state) => state.products.products);
   const productStatus = useSelector((state) => state.products.status);
   const error = useSelector((state) => state.products.error);
-
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  
-  const [filters, setFilters] = useState({
-    name: '',
-    category: null,
-    priceRange: [0, 10000],
-  });
+  const filters = useSelector((state) => state.filters);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10; 
+  const pageSize = 10;
 
   useEffect(() => {
-    if (productStatus === 'idle') {
+    if (productStatus === "idle") {
       dispatch(fetchProducts());
     }
   }, [productStatus, dispatch]);
 
-  useEffect(() => {
-    let products = [...allProducts];
-
-    // Filter by name
-    if (filters.name) {
-      products = products.filter(p => p.name.toLowerCase().includes(filters.name.toLowerCase()));
-    }
-
-    // Filter by category
-    if (filters.category) {
-      products = products.filter(p => p.categoryId === filters.category);
-    }
-
-    // Filter by price
-    products = products.filter(p => p.finalPrice >= filters.priceRange[0] && p.finalPrice <= filters.priceRange[1]);
-
-    setFilteredProducts(products);
-    setCurrentPage(1); // Reset to first page after filtering
-  }, [filters, allProducts]);
-
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value,
-    }));
+    dispatch(setFilter({ filterName, value }));
   };
+
+  const filteredProducts = allProducts.filter((p) => {
+    const byName =
+      !filters.name ||
+      p.name.toLowerCase().includes(filters.name.toLowerCase());
+    const byCategory = filters.category === null || p.categoryId === filters.category;
+    const byPrice =
+      p.finalPrice >= filters.priceRange[0] &&
+      p.finalPrice <= filters.priceRange[1];
+    return byName && byCategory && byPrice;
+  });
 
   // 🔹 calcular productos visibles según la página
   const indexOfLast = currentPage * pageSize;
@@ -65,9 +47,9 @@ const HomePage = () => {
 
   let content;
 
-  if (productStatus === 'loading') {
+  if (productStatus === "loading") {
     content = <p>Loading products...</p>;
-  } else if (productStatus === 'succeeded') {
+  } else if (productStatus === "succeeded") {
     if (filteredProducts.length > 0) {
       content = (
         <>
@@ -93,7 +75,7 @@ const HomePage = () => {
     } else {
       content = <p>No products found.</p>;
     }
-  } else if (productStatus === 'failed') {
+  } else if (productStatus === "failed") {
     content = <p>{error}</p>;
   }
 
@@ -102,12 +84,11 @@ const HomePage = () => {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CategoryFilter
           activeCategory={filters.category}
-          onCategoryChange={(categoryId) => handleFilterChange('category', categoryId)}
+          onCategoryChange={(categoryId) =>
+            handleFilterChange("category", categoryId)
+          }
         />
-        <Filter 
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        <Filter filters={filters} onFilterChange={handleFilterChange} />
         {content}
       </main>
     </div>

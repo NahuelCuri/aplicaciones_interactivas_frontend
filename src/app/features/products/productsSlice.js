@@ -9,8 +9,13 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async ()
 
 // Thunks for seller products
 export const fetchSellerProducts = createAsyncThunk('products/fetchSellerProducts', async () => {
-  const response = await productService.getSellerProducts();
-  return response.data;
+  try {
+    const response = await productService.getSellerProducts();
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching seller products:', error.response ? error.response.data : error.message);
+    throw error;
+  }
 });
 
 export const searchSellerProducts = createAsyncThunk('products/searchSellerProducts', async (searchTerm) => {
@@ -64,7 +69,11 @@ const productsSlice = createSlice({
       state.selectedProduct = null;
       state.selectedProductStatus = 'idle';
       state.selectedProductError = null;
-    }
+    },
+    setSelectedProduct: (state, action) => {
+      state.selectedProduct = action.payload;
+      state.selectedProductStatus = 'succeeded';
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -118,5 +127,5 @@ const productsSlice = createSlice({
   },
 });
 
-export const { clearSelectedProduct } = productsSlice.actions;
+export const { clearSelectedProduct, setSelectedProduct } = productsSlice.actions;
 export default productsSlice.reducer;

@@ -1,31 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createProduct } from '../app/features/products/productsSlice';
-import categoryService from '../services/categoryService';
+import { fetchCategories } from '../app/features/categories/categorySlice';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
 const AddProductModal = ({ onClose }) => {
   const dispatch = useDispatch();
+  const { categories, status: categoriesStatus } = useSelector(state => state.categories);
   const [formData, setFormData] = useState({});
-  const [categories, setCategories] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    categoryService.getAllCategories()
-      .then(response => {
-        setCategories(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching categories:', error);
-      });
-
+    if (categoriesStatus === 'idle') {
+      dispatch(fetchCategories());
+    }
     return () => {
       newImages.forEach(file => URL.revokeObjectURL(file.preview));
     };
-  }, [newImages]);
+  }, [categoriesStatus, dispatch, newImages]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

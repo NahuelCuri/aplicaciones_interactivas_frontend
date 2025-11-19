@@ -1,28 +1,26 @@
 import { useEffect, useState } from "react";
-import userService from "../services/userService";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchUsers,
+  updateUser,
+  deleteUser,
+} from "../app/features/users/userSlice";
 import EditUserModal from "../components/EditUserModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 const UserAdminPage = () => {
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { users, status, error } = useSelector((state) => state.users);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await userService.getUsers();
-      setUsers(response.data);
-    } catch (err) {
-      setError(err);
-      console.error("Failed to fetch users:", err);
-    }
-  };
-
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (status === "idle") {
+      dispatch(fetchUsers());
+    }
+  }, [status, dispatch]);
 
   const handleEdit = (user) => {
     setSelectedUser(user);
@@ -41,26 +39,14 @@ const UserAdminPage = () => {
   };
 
   const handleSave = async (userId, userData) => {
-    try {
-      await userService.updateUser(userId, userData);
-      handleCloseModals();
-      fetchUsers();
-    } catch (err) {
-      console.error("Failed to update user:", err);
-      setError(err);
-    }
+    dispatch(updateUser({ id: userId, data: userData }));
+    handleCloseModals();
   };
 
   const handleDelete = async () => {
     if (!selectedUser) return;
-    try {
-      await userService.deleteUser(selectedUser.id);
-      handleCloseModals();
-      fetchUsers();
-    } catch (err) {
-      console.error("Failed to delete user:", err);
-      setError(err);
-    }
+    dispatch(deleteUser(selectedUser.id));
+    handleCloseModals();
   };
 
   const getRoleBadge = (role) => {
@@ -81,30 +67,71 @@ const UserAdminPage = () => {
       <main className="flex-1 overflow-y-auto p-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Users</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Manage Users
+            </h2>
           </div>
-          {error && <p className="text-red-500">Error: {error.message}</p>}
+          {status === "loading" && <p>Loading...</p>}
+          {status === "failed" && (
+            <p className="text-red-500">Error: {error}</p>
+          )}
           <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300" scope="col">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300" scope="col">Username</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300" scope="col">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300" scope="col">Roles</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300" scope="col">Actions</th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                    scope="col"
+                  >
+                    ID
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                    scope="col"
+                  >
+                    Username
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                    scope="col"
+                  >
+                    Email
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                    scope="col"
+                  >
+                    Roles
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300"
+                    scope="col"
+                  >
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {users.map((user) => (
                   <tr key={user.id}>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{user.id}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{user.username}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{user.email}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      {user.id}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                      {user.username}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      {user.email}
+                    </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center gap-2">
                         {user.roles.map((role, index) => (
-                          <span key={`${user.id}-${role.name}-${index}`} className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getRoleBadge(role.name)}`}>
+                          <span
+                            key={`${user.id}-${role.name}-${index}`}
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getRoleBadge(
+                              role.name
+                            )}`}
+                          >
                             {role.name}
                           </span>
                         ))}
@@ -112,8 +139,18 @@ const UserAdminPage = () => {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
                       <div className="flex items-center gap-4">
-                        <button onClick={() => handleEdit(user)} className="text-primary hover:underline">Edit</button>
-                        <button onClick={() => handleDeleteClick(user)} className="text-red-500 hover:underline">Delete</button>
+                        <button
+                          onClick={() => handleEdit(user)}
+                          className="text-primary hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(user)}
+                          className="text-red-500 hover:underline"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -124,16 +161,16 @@ const UserAdminPage = () => {
         </div>
       </main>
       {isEditModalOpen && (
-        <EditUserModal 
-          user={selectedUser} 
-          onClose={handleCloseModals} 
-          onSave={handleSave} 
+        <EditUserModal
+          user={selectedUser}
+          onClose={handleCloseModals}
+          onSave={handleSave}
         />
       )}
       {isDeleteModalOpen && (
-        <DeleteConfirmationModal 
-          onCancel={handleCloseModals} 
-          onConfirm={handleDelete} 
+        <DeleteConfirmationModal
+          onCancel={handleCloseModals}
+          onConfirm={handleDelete}
         />
       )}
     </div>

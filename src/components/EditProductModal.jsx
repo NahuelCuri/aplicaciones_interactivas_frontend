@@ -1,36 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateProduct } from '../app/features/products/productsSlice';
-import categoryService from '../services/categoryService';
+import { fetchCategories } from '../app/features/categories/categorySlice';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 
 const EditProductModal = ({ product, onClose }) => {
   const dispatch = useDispatch();
+  const { categories, status: categoriesStatus } = useSelector(state => state.categories);
   const [formData, setFormData] = useState(product);
-  const [categories, setCategories] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [imagesToDelete, setImagesToDelete] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    categoryService.getAllCategories()
-      .then(response => {
-        setCategories(response.data);
-        const productCategory = response.data.find(cat => cat.name === product.categoryName);
-        if (productCategory) {
-          setFormData(prev => ({ ...prev, categoryId: productCategory.id }));
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching categories:', error);
-      });
-
+    if (categoriesStatus === 'idle') {
+      dispatch(fetchCategories());
+    }
+    const productCategory = categories.find(cat => cat.name === product.categoryName);
+    if (productCategory) {
+      setFormData(prev => ({ ...prev, categoryId: productCategory.id }));
+    }
     return () => {
       newImages.forEach(file => URL.revokeObjectURL(file.preview));
     };
-  }, [product.categoryName, newImages]);
+  }, [product.categoryName, newImages, categoriesStatus, dispatch, categories]);
 
   useEffect(() => {
     setFormData(product);

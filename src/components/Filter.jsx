@@ -1,19 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { CSSTransition } from 'react-transition-group';
+import { fetchCategories } from '../app/features/categories/categorySlice';
 
 const Filter = ({ filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const dispatch = useDispatch();
+  const { categories, status: categoriesStatus } = useSelector(state => state.categories);
   const nodeRef = useRef(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch((err) => console.error("Error fetching categories:", err));
-  }, []);
+    if (categoriesStatus === 'idle') {
+      dispatch(fetchCategories());
+    }
+  }, [categoriesStatus, dispatch]);
 
   return (
     <div className="my-4">

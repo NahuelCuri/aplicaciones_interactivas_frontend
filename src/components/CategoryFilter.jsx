@@ -1,24 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCategories } from "../app/features/categories/categorySlice";
 
 const CategoryFilter = ({ activeCategory, onCategoryChange }) => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { categories, status, error } = useSelector(
+    (state) => state.categories
+  );
 
   useEffect(() => {
-    fetch("http://localhost:8080/categories") // 👈 Ajustá la URL según tu backend
-      .then((res) => {
-        if (!res.ok) throw new Error("Error fetching categories");
-        return res.json();
-      })
-      .then((data) => setCategories(data))
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+    if (status === "idle") {
+      dispatch(fetchCategories());
+    }
+  }, [status, dispatch]);
 
-  if (loading) {
+  if (status === "loading") {
     return (
       <div className="mb-8 text-gray-600 dark:text-gray-300 text-sm">
         Loading categories...
+      </div>
+    );
+  }
+
+  if (status === "failed") {
+    return (
+      <div className="mb-8 text-red-500 text-sm italic">
+        Error: {error}
       </div>
     );
   }
