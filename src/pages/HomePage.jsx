@@ -18,10 +18,12 @@ const HomePage = () => {
   const pageSize = 10;
 
   useEffect(() => {
-    if (productStatus === "idle") {
+    // Only fetch products if the list is empty. This loads initial data 
+    // efficiently and relies on Redux for all subsequent updates.
+    if (allProducts.length === 0) {
       dispatch(fetchProducts());
     }
-  }, [productStatus, dispatch]);
+  }, [allProducts.length, dispatch]);
 
   const handleFilterChange = (filterName, value) => {
     dispatch(setFilter({ filterName, value }));
@@ -31,7 +33,7 @@ const HomePage = () => {
     const byName =
       !filters.name ||
       p.name.toLowerCase().includes(filters.name.toLowerCase());
-    const byCategory = filters.category === null || p.categoryId === filters.category;
+    const byCategory = filters.category === null || p.categoryId == filters.category;
     const byPrice =
       p.finalPrice >= filters.priceRange[0] &&
       p.finalPrice <= filters.priceRange[1];

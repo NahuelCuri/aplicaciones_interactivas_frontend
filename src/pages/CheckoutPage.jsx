@@ -1,19 +1,21 @@
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import ShippingForm from "../components/ShippingForm";
 import PaymentForm from "../components/PaymentForm";
 import CheckoutOrderSummary from "../components/CheckoutOrderSummary";
-import orderService from '../services/orderService';
-import { useCart } from '../components/CartContext';
+import { checkoutCart } from '../app/features/cart/cartSlice';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { fetchCart } = useCart();
+  const dispatch = useDispatch();
 
   const handlePlaceOrder = async () => {
     try {
-      const order = await orderService.checkout();
-      fetchCart(); // to refresh the cart
-      navigate(`/order-confirmation/${order.data.id}`);
+      const resultAction = await dispatch(checkoutCart());
+      if (checkoutCart.fulfilled.match(resultAction)) {
+        const order = resultAction.payload;
+        navigate(`/order-confirmation/${order.id}`);
+      }
     } catch (error) {
       console.error('Failed to place order', error);
       // Handle error, e.g., show a notification

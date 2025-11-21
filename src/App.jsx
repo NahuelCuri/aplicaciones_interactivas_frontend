@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
 import MainLayout from "./components/MainLayout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -12,8 +14,21 @@ import BecomeSellerPage from "./pages/BecomeSellerPage";
 import UserAdminPage from "./pages/UserAdminPage";
 import CategoryAdminPage from "./pages/CategoryAdminPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import { selectIsAuthenticated } from "./app/features/auth/authSlice";
+import { fetchCart, clearCart } from "./app/features/cart/cartSlice";
 
 const App = () => {
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+    } else {
+      dispatch(clearCart());
+    }
+  }, [isAuthenticated, dispatch]);
+
   return (
     <Router>
       <Routes>

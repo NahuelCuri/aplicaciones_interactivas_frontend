@@ -1,7 +1,8 @@
-import { useCart } from "./CartContext";
+import { useSelector } from "react-redux";
+import { selectCart } from "../app/features/cart/cartSlice";
 
 const CheckoutOrderSummary = () => {
-  const { cart } = useCart();
+  const cart = useSelector(selectCart);
   const subtotal = cart?.items?.reduce((acc, item) => acc + item.priceAtPurchase * item.quantity, 0) || 0;
   const shipping = 0; // Assuming free shipping for now
   const total = subtotal + shipping;

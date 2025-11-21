@@ -36,12 +36,15 @@ const SellerProductList = () => {
       if (searchTerm) {
         dispatch(searchSellerProducts(searchTerm));
       } else {
-        dispatch(fetchSellerProducts());
+        // Only fetch the full list if it has never been fetched before
+        if (sellerStatus === 'idle') {
+          dispatch(fetchSellerProducts());
+        }
       }
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, dispatch]);
+  }, [searchTerm, dispatch, sellerStatus]);
 
   useEffect(() => {
     if (selectedProductStatus === 'succeeded') {

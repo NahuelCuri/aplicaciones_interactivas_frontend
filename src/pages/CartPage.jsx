@@ -1,9 +1,10 @@
 import CartItem from "../components/CartItem";
 import OrderSummary from "../components/OrderSummary";
-import { useCart } from "../components/CartContext";
+import { useSelector } from "react-redux";
+import { selectCart } from "../app/features/cart/cartSlice";
 
 const CartPage = () => {
-  const { cart } = useCart();
+  const cart = useSelector(selectCart);
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col">

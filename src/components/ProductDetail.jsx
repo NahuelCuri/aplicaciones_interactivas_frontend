@@ -3,17 +3,19 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { useCart } from "./CartContext";
 import {
   fetchProductById,
   clearSelectedProduct,
+  setSelectedProduct,
 } from "../app/features/products/productsSlice";
 import { selectIsAuthenticated, selectIsBuyer } from "../app/features/auth/authSlice";
+import { addItemToCart } from "../app/features/cart/cartSlice";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const {
+    products,
     selectedProduct: product,
     selectedProductStatus: status,
     selectedProductError: error,
@@ -21,7 +23,6 @@ const ProductDetail = () => {
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isBuyer = useSelector(selectIsBuyer);
-  const { addItemToCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -45,7 +46,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (product) {
-      addItemToCart(product.id, 1);
+      dispatch(addItemToCart({ productId: product.id, quantity: 1 }));
       console.log(`Added ${product.name} to cart`);
     }
   };

@@ -23,21 +23,29 @@ export const searchSellerProducts = createAsyncThunk('products/searchSellerProdu
   return response.data;
 });
 
-export const createProduct = createAsyncThunk('products/createProduct', async (productData, { dispatch }) => {
+export const createProduct = createAsyncThunk('products/createProduct', async (productData, { getState }) => {
   const response = await productService.createProduct(productData);
-  dispatch(fetchSellerProducts()); // Refetch products to get the latest list
-  return response.data;
+  const newProductDetail = response.data;
+  
+  // Enrich the product with the category name from the state
+  const { categories } = getState().categories;
+  const category = categories.find(cat => cat.id == newProductDetail.categoryId);
+  
+  const categoryName = category ? category.name : 'Unknown';
+
+  return {
+    ...newProductDetail,
+    categoryName,
+  };
 });
 
-export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, data }, { dispatch }) => {
+export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, data }) => {
   const response = await productService.updateProduct(id, data);
-  dispatch(fetchSellerProducts()); // Refetch products to get the latest list
   return response.data;
 });
 
-export const deleteProduct = createAsyncThunk('products/deleteProduct', async (productId, { dispatch }) => {
+export const deleteProduct = createAsyncThunk('products/deleteProduct', async (productId) => {
   await productService.deleteProduct(productId);
-  dispatch(fetchSellerProducts()); // Refetch products to get the latest list
   return productId;
 });
 
@@ -123,6 +131,44 @@ const productsSlice = createSlice({
       .addCase(fetchProductById.rejected, (state, action) => {
         state.selectedProductStatus = 'failed';
         state.selectedProductError = action.error.message;
+      })
+      // Reducers for CRUD operations
+      .addCase(createProduct.fulfilled, (state, action) => {
+        const newProductDetail = action.payload;
+        // Transform the detailed DTO into a list DTO
+        const newProductList = {
+          ...newProductDetail,
+          mainImageBase64: newProductDetail.images?.[0]?.content || null,
+        };
+        
+        state.products.push(newProductList);
+        state.sellerProducts.push(newProductList);
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        const updatedProductDetail = action.payload;
+        // Transform the detailed DTO into a list DTO
+        const updatedProductList = {
+          ...updatedProductDetail,
+          mainImageBase64: updatedProductDetail.images?.[0]?.content || null,
+        };
+
+        // Update public list
+        const publicIndex = state.products.findIndex(p => p.id === updatedProductList.id);
+        if (publicIndex !== -1) {
+          state.products[publicIndex] = updatedProductList;
+        }
+        // Update seller list
+        const sellerIndex = state.sellerProducts.findIndex(p => p.id === updatedProductList.id);
+        if (sellerIndex !== -1) {
+          state.sellerProducts[sellerIndex] = updatedProductList;
+        }
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        const productId = action.payload;
+        // Remove from public list
+        state.products = state.products.filter(p => p.id !== productId);
+        // Remove from seller list
+        state.sellerProducts = state.sellerProducts.filter(p => p.id !== productId);
       });
   },
 });

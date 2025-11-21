@@ -1,23 +1,24 @@
-import { useCart } from "./CartContext";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { removeItemFromCart, updateCartItemQuantity } from "../app/features/cart/cartSlice";
 
 const CartItem = ({ item }) => {
   const { product, quantity, priceAtPurchase } = item;
-  const { removeItemFromCart, updateCartItemQuantity } = useCart();
+  const dispatch = useDispatch();
 
   const handleRemove = () => {
-    removeItemFromCart(product.id);
+    dispatch(removeItemFromCart(product.id));
   };
 
   const handleIncrease = () => {
-    updateCartItemQuantity(product.id, quantity + 1);
+    dispatch(updateCartItemQuantity({ productId: product.id, quantity: quantity + 1 }));
   };
 
   const handleDecrease = () => {
     if (quantity > 1) {
-      updateCartItemQuantity(product.id, quantity - 1);
+      dispatch(updateCartItemQuantity({ productId: product.id, quantity: quantity - 1 }));
     } else {
-      removeItemFromCart(product.id);
+      dispatch(removeItemFromCart(product.id));
     }
   };
 
