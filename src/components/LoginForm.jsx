@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import TextInput from './TextInput';
-import authService from '../services/authService';
-import { useAuth } from '../services/AuthContext';
+import { loginUser, selectAuthError, selectAuthIsLoading, selectUser } from '../app/features/auth/authSlice';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [validationError, setValidationError] = useState('');
-  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const dispatch = useDispatch();
+
+  const isLoading = useSelector(selectAuthIsLoading);
+  const error = useSelector(selectAuthError);
+  const user = useSelector(selectUser);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,25 +26,18 @@ const LoginForm = () => {
     }
     setValidationError('');
 
-    setError('');
-    setLoading(true);
-    try {
-      const response = await authService.login(email, password);
-      const { user, access_token } = response.data;
-      login(user, access_token);
+    dispatch(loginUser({ email, password }));
+  };
 
+  useEffect(() => {
+    if (user) {
       if (user.roles.includes('ADMIN')) {
         navigate('/admin/users');
       } else {
         navigate('/');
       }
-    } catch (err) {
-      setError('Failed to log in. Please check your credentials.');
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user, navigate]);
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit} noValidate>
@@ -92,9 +88,9 @@ const LoginForm = () => {
         <button
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
           type="submit"
-          disabled={loading}
+          disabled={isLoading}
         >
-          {loading ? 'Logging in...' : 'Log in'}
+          {isLoading ? 'Logging in...' : 'Log in'}
         </button>
       </div>
     </form>

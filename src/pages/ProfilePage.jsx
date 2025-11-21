@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../services/AuthContext";
+import { useSelector } from "react-redux";
+import { selectUser } from "../app/features/auth/authSlice";
 import orderService from "../services/orderService";
 
 const statusColors = {
@@ -11,7 +12,7 @@ const statusColors = {
 
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectUser);
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ const ProfilePage = () => {
                     {orders.map((order) => (
                       <tr key={order.id}>
                         <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">#{order.id}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(order.createdAt).toLocaleDateDateString()}</td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[order.status]}`}>
                             {order.status}

@@ -1,12 +1,13 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useSelector } from 'react-redux';
 import orderService from '../services/orderService';
-import useAuth from '../services/useAuth';
+import { selectIsAuthenticated } from '../app/features/auth/authSlice';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
     if (isAuthenticated) {

@@ -1,17 +1,15 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import userService from '../services/userService';
-import { useAuth } from '../services/AuthContext';
+import { useDispatch } from 'react-redux';
+import { upgradeToSeller } from '../app/features/auth/authSlice';
 
 const BecomeSellerPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const dispatch = useDispatch();
 
   const handleClick = async () => {
     try {
-      const response = await userService.becomeSeller();
-      const { access_token, user } = response.data;
-      login(user, access_token);
+      await dispatch(upgradeToSeller()).unwrap();
       navigate('/');
     } catch (error) {
       console.error('Failed to become a seller', error);

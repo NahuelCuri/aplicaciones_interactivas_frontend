@@ -3,25 +3,24 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { useAuth } from "../services/AuthContext";
 import { useCart } from "./CartContext";
 import {
   fetchProductById,
   clearSelectedProduct,
-  setSelectedProduct,
 } from "../app/features/products/productsSlice";
+import { selectIsAuthenticated, selectIsBuyer } from "../app/features/auth/authSlice";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const {
-    products,
     selectedProduct: product,
     selectedProductStatus: status,
     selectedProductError: error,
   } = useSelector((state) => state.products);
 
-  const { isAuthenticated, isBuyer } = useAuth();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isBuyer = useSelector(selectIsBuyer);
   const { addItemToCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);

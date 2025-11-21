@@ -1,14 +1,18 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../services/AuthContext';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import CartDropdown from './CartDropdown';
 import UserDropdown from './UserDropdown';
 import { useDetectOutsideClick } from '../services/useDetectOutsideClick';
 import { useCart } from './CartContext';
 import { useState } from 'react';
+import { selectIsAdmin, selectIsAuthenticated, selectIsBuyer, selectIsSeller } from '../app/features/auth/authSlice';
 
 const Header = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated, logout, isSeller, isAdmin, isBuyer } = useAuth();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isSeller = useSelector(selectIsSeller);
+  const isAdmin = useSelector(selectIsAdmin);
+  const isBuyer = useSelector(selectIsBuyer);
+
   const { triggerRef: cartTriggerRef, nodeRef: cartNodeRef, isActive: isCartActive, setIsActive: setIsCartActive } = useDetectOutsideClick(false);
   const { triggerRef: userTriggerRef, nodeRef: userNodeRef, isActive: isUserActive, setIsActive: setIsUserActive } = useDetectOutsideClick(false);
   const { cart } = useCart();
@@ -16,11 +20,6 @@ const Header = () => {
 
   const handleProfileClick = () => {
     setIsUserActive(!isUserActive);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
   };
 
   return (

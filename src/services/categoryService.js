@@ -1,30 +1,21 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:8080/categories';
-
-const getAuthHeaders = () => {
-  const token = sessionStorage.getItem('token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+const API_URL = '/categories';
 
 const getAllCategories = () => {
-  return axios.get(API_URL);
+  return api.get(API_URL);
 };
 
 const createCategory = (categoryData) => {
-  return axios.post(API_URL, categoryData, getAuthHeaders());
+  return api.post(API_URL, categoryData);
 };
 
 const updateCategory = (id, categoryData) => {
-  return axios.put(`${API_URL}/${id}`, categoryData, getAuthHeaders());
+  return api.put(`${API_URL}/${id}`, categoryData);
 };
 
 const deleteCategory = (id) => {
-  return axios.delete(`${API_URL}/${id}`, getAuthHeaders());
+  return api.delete(`${API_URL}/${id}`);
 };
 
 const categoryService = {

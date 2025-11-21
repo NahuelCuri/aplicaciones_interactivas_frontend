@@ -1,38 +1,29 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:8080/order';
-
-const getAuthHeaders = () => {
-  const token = sessionStorage.getItem('token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+const API_URL = '/order';
 
 const getCart = () => {
-  return axios.get(`${API_URL}/cart`, getAuthHeaders());
+  return api.get(`${API_URL}/cart`);
 };
 
 const addItemToCart = (productId, quantity) => {
-  return axios.post(`${API_URL}/cart/items`, { productId, quantity }, getAuthHeaders());
+  return api.post(`${API_URL}/cart/items`, { productId, quantity });
 };
 
 const removeItemFromCart = (productId) => {
-  return axios.delete(`${API_URL}/cart/items/${productId}`, getAuthHeaders());
+  return api.delete(`${API_URL}/cart/items/${productId}`);
 };
 
 const updateCartItemQuantity = (productId, quantity) => {
-  return axios.put(`${API_URL}/cart/items/${productId}`, { quantity }, getAuthHeaders());
+  return api.put(`${API_URL}/cart/items/${productId}`, { quantity });
 };
 
 const getOrdersByUser = (buyerId) => {
-  return axios.get(`${API_URL}/users/${buyerId}/orders`, getAuthHeaders());
+  return api.get(`/users/${buyerId}/orders`);
 };
 
 const checkout = () => {
-  return axios.post(`${API_URL}/checkout`, {}, getAuthHeaders());
+  return api.post(`${API_URL}/checkout`, {});
 };
 
 export default {

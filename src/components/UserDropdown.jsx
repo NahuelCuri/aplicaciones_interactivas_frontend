@@ -1,14 +1,21 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../services/AuthContext";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectIsSeller, selectUser } from "../app/features/auth/authSlice";
 
 const UserDropdown = () => {
-  const { user, logout, isSeller } = useAuth();
+  const user = useSelector(selectUser);
+  const isSeller = useSelector(selectIsSeller);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate('/');
   };
+
+  if (!user) {
+    return null; // Or a loading spinner, or some fallback UI
+  }
 
   return (
     <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1C1A2E] rounded-xl shadow-lg p-2">

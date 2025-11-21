@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import useAuth from '../services/useAuth';
+import { useSelector } from 'react-redux';
 import { useCart } from './CartContext';
+import { selectIsAuthenticated } from '../app/features/auth/authSlice';
 
 const CartDropdown = () => {
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const { cart } = useCart();
 
   const total = cart?.items?.reduce((acc, item) => acc + item.priceAtPurchase * item.quantity, 0) || 0;

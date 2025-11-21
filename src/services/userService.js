@@ -1,30 +1,21 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:8080/users';
-
-const getAuthHeaders = () => {
-  const token = sessionStorage.getItem('token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+const API_URL = '/users';
 
 const getUsers = () => {
-  return axios.get(API_URL, getAuthHeaders());
+  return api.get(API_URL);
 };
 
 const updateUser = (id, userData) => {
-  return axios.put(`${API_URL}/${id}`, userData, getAuthHeaders());
+  return api.put(`${API_URL}/${id}`, userData);
 };
 
 const deleteUser = (id) => {
-  return axios.delete(`${API_URL}/${id}`, getAuthHeaders());
+  return api.delete(`${API_URL}/${id}`);
 };
 
 const becomeSeller = () => {
-  return axios.put(`${API_URL}/become-seller`, {}, getAuthHeaders());
+  return api.put(`${API_URL}/become-seller`, {});
 };
 
 export default {

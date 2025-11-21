@@ -1,37 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../services/authService';
+import { useDispatch, useSelector } from 'react-redux';
 import TextInput from './TextInput';
-import useAuth from '../services/useAuth';
+import { registerUser, selectAuthError, selectAuthIsLoading } from '../app/features/auth/authSlice';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const [validationError, setValidationError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const isLoading = useSelector(selectAuthIsLoading);
+  const error = useSelector(selectAuthError);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setValidationError('Passwords do not match');
       return;
     }
-    try {
-      const response = await authService.register(username, email, password, 'BUYER');
-      const { access_token: accessToken, user } = response.data;
-      login(user, accessToken);
-      navigate('/');
-    } catch (err) {
-      setError('Failed to register');
-    }
+    setValidationError('');
+    dispatch(registerUser({ username, email, password, role: 'BUYER' })).then((result) => {
+      if (registerUser.fulfilled.match(result)) {
+        navigate('/login');
+      }
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
       {error && <p className="text-red-500 text-center">{error}</p>}
+      {validationError && <p className="text-red-500 text-center">{validationError}</p>}
       <div className="space-y-4">
         <div>
           <label className="text-sm font-medium" htmlFor="username">Username</label>
@@ -86,8 +89,8 @@ const RegisterForm = () => {
         </div>
       </div>
       <div>
-        <button type="submit" className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
-          Register
+        <button type="submit" className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" disabled={isLoading}>
+          {isLoading ? 'Registering...' : 'Register'}
         </button>
       </div>
     </form>
