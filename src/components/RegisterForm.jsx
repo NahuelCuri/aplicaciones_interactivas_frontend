@@ -26,7 +26,7 @@ const RegisterForm = () => {
     setValidationError('');
     dispatch(registerUser({ username, email, password, role: 'BUYER' })).then((result) => {
       if (registerUser.fulfilled.match(result)) {
-        navigate('/login');
+        navigate('/');
       }
     });
   };

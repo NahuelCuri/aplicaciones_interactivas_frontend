@@ -2,11 +2,23 @@ import { useNavigate } from 'react-router-dom';
 
 const OrderSummary = ({ cart }) => {
   const navigate = useNavigate();
-  const subtotal = cart?.items?.reduce((acc, item) => acc + item.priceAtPurchase * item.quantity, 0) || 0;
+  
+  // Calculate subtotal only from available items
+  const subtotal = cart?.items?.reduce((acc, item) => {
+    return item.product.deleted ? acc : acc + item.priceAtPurchase * item.quantity;
+  }, 0) || 0;
+  
   const shipping = 0;
   const total = subtotal + shipping;
 
+  // Check if any item in the cart is deleted
+  const hasDeletedItems = cart?.items?.some(item => item.product.deleted) || false;
+
   const handleCheckout = () => {
+    if (hasDeletedItems) {
+      alert("Please remove unavailable items from your cart before proceeding.");
+      return;
+    }
     navigate('/checkout');
   };
 
@@ -28,9 +40,15 @@ const OrderSummary = ({ cart }) => {
         <span className="text-gray-900 dark:text-white">Total</span>
         <span className="text-gray-900 dark:text-white">${total.toFixed(2)}</span>
       </div>
+      {hasDeletedItems && (
+        <p className="mt-4 text-sm text-red-600">
+          Some items in your cart are no longer available. Please remove them to proceed.
+        </p>
+      )}
       <button
         onClick={handleCheckout}
-        className="mt-6 w-full flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-bold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark transition-all"
+        disabled={hasDeletedItems}
+        className="mt-6 w-full flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-bold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
         Proceed to Checkout
       </button>

@@ -56,22 +56,25 @@ export const fetchProductById = createAsyncThunk('products/fetchProductById', as
 });
 
 
+export const initialState = {
+  // For public product list
+  products: [],
+  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: null,
+  // For seller's own products
+  sellerProducts: [],
+  sellerStatus: 'idle',
+  sellerError: null,
+  // For single product view/edit
+  selectedProduct: null,
+  selectedProductStatus: 'idle',
+  selectedProductError: null,
+};
+
+
 const productsSlice = createSlice({
   name: 'products',
-  initialState: {
-    // For public product list
-    products: [],
-    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-    error: null,
-    // For seller's own products
-    sellerProducts: [],
-    sellerStatus: 'idle',
-    sellerError: null,
-    // For single product view/edit
-    selectedProduct: null,
-    selectedProductStatus: 'idle',
-    selectedProductError: null,
-  },
+  initialState: initialState,
   reducers: {
     clearSelectedProduct: (state) => {
       state.selectedProduct = null;

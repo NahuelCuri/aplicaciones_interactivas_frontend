@@ -27,6 +27,7 @@ const HomePage = () => {
 
   const handleFilterChange = (filterName, value) => {
     dispatch(setFilter({ filterName, value }));
+    setCurrentPage(1);
   };
 
   const filteredProducts = allProducts.filter((p) => {
