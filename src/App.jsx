@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import MainLayout from "./components/MainLayout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -31,6 +34,20 @@ const App = () => {
 
   return (
     <Router>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        closeButton={false}
+        bodyClassName={() => "p-0"}
+      />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />

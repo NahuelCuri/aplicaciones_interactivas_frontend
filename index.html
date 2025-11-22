@@ -5,7 +5,41 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UADE Marketplace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+
+      /* Custom Toastify Styles */
+      .Toastify__toast-container {
+        width: 384px;
+      }
+      .Toastify__toast {
+        padding: 0;
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+        background-color: #FFFFFF; /* bg-surface */
+      }
+      .dark .Toastify__toast {
+        background-color: #1f1c2f; /* bg-card-dark */
+      }
+      .Toastify__progress-bar {
+        height: 4px;
+      }
+      .Toastify__progress-bar--success {
+        background-color: #10B981;
+      }
+      .Toastify__progress-bar--info {
+        background-color: #4F46E5;
+      }
+      .Toastify__progress-bar--error {
+        background-color: #EF4444;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

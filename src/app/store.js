@@ -9,6 +9,7 @@ import authReducer, { logout } from './features/auth/authSlice';
 import cartReducer from './features/cart/cartSlice';
 import orderReducer from './features/orders/orderSlice';
 import rolesReducer from './features/roles/roleSlice';
+import { notificationsListenerMiddleware } from './middleware/notificationsMiddleware';
 import api from '../services/api';
 
 const appReducer = combineReducers({
@@ -47,6 +48,8 @@ const rootReducer = (state, action) => {
 
 export const store = configureStore({
   reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(notificationsListenerMiddleware.middleware),
 });
 
 // Setup interceptors after store is created
