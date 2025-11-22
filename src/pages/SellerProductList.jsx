@@ -4,9 +4,11 @@ import {
   fetchSellerProducts,
   searchSellerProducts,
   deleteProduct,
+} from '../app/features/products/sellerProductsSlice';
+import {
   fetchProductById,
-  clearSelectedProduct,
-} from '../app/features/products/productsSlice';
+  clearProductDetail,
+} from '../app/features/products/productDetailSlice';
 import Pagination from '../components/Pagination';
 import EditProductModal from '../components/EditProductModal';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -15,11 +17,13 @@ import AddProductModal from '../components/AddProductModal';
 const SellerProductList = () => {
   const dispatch = useDispatch();
   const {
-    sellerProducts,
-    sellerStatus,
-    selectedProduct,
-    selectedProductStatus,
-  } = useSelector((state) => state.products);
+    list: sellerProducts,
+    status: sellerStatus,
+  } = useSelector((state) => state.sellerProducts);
+  const {
+    detail: selectedProduct,
+    status: selectedProductStatus,
+  } = useSelector((state) => state.productDetail);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,7 +62,7 @@ const SellerProductList = () => {
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
-    dispatch(clearSelectedProduct());
+    dispatch(clearProductDetail());
   };
 
   const handleOpenConfirmModal = (product) => {

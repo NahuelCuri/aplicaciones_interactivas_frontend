@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "../app/features/auth/authSlice";
-import orderService from "../services/orderService";
+import { fetchOrdersByUser, selectUserOrders, selectOrdersStatus, selectOrdersError } from "../app/features/orders/orderSlice";
 
 const statusColors = {
   Shipped: "bg-blue-100/80 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
@@ -12,23 +12,17 @@ const statusColors = {
 
 
 const ProfilePage = () => {
+  const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const [orders, setOrders] = useState([]);
+  const orders = useSelector(selectUserOrders);
+  const ordersStatus = useSelector(selectOrdersStatus);
+  const ordersError = useSelector(selectOrdersError);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (user && user.id) {
-        try {
-          const response = await orderService.getOrdersByUser(user.id);
-          setOrders(response.data);
-        } catch (error) {
-          console.error("Failed to fetch orders:", error);
-        }
-      }
-    };
-
-    fetchOrders();
-  }, [user]);
+    if (user && user.id && ordersStatus === 'idle') {
+      dispatch(fetchOrdersByUser(user.id));
+    }
+  }, [user, dispatch, ordersStatus]);
 
   if (!user) {
     return (
@@ -40,6 +34,31 @@ const ProfilePage = () => {
             </main>
           </div>    );
   }
+
+  let orderContent;
+  if (ordersStatus === 'loading') {
+    orderContent = <tr><td colSpan="4" className="text-center py-4">Loading orders...</td></tr>;
+  } else if (ordersStatus === 'succeeded') {
+    if (orders.length === 0) {
+      orderContent = <tr><td colSpan="4" className="text-center py-4">You have no orders.</td></tr>;
+    } else {
+      orderContent = orders.map((order) => (
+        <tr key={order.id}>
+          <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">#{order.id}</td>
+          <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</td>
+          <td className="whitespace-nowrap px-6 py-4">
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[order.status]}`}>
+              {order.status}
+            </span>
+          </td>
+          <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">${order.totalPrice.toFixed(2)}</td>
+        </tr>
+      ));
+    }
+  } else if (ordersStatus === 'failed') {
+    orderContent = <tr><td colSpan="4" className="text-center py-4 text-red-500">{ordersError}</td></tr>;
+  }
+
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -77,18 +96,7 @@ const ProfilePage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200/50 dark:divide-gray-700/50">
-                    {orders.map((order) => (
-                      <tr key={order.id}>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">#{order.id}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(order.createdAt).toLocaleDateDateString()}</td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[order.status]}`}>
-                            {order.status}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">${order.totalPrice.toFixed(2)}</td>
-                      </tr>
-                    ))}
+                    {orderContent}
                   </tbody>
                 </table>
               </div>

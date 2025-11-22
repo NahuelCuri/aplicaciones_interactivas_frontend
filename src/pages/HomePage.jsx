@@ -9,7 +9,7 @@ import { setFilter } from "../app/features/filters/filterSlice";
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const allProducts = useSelector((state) => state.products.products);
+  const allProducts = useSelector((state) => state.products.list);
   const productStatus = useSelector((state) => state.products.status);
   const error = useSelector((state) => state.products.error);
   const filters = useSelector((state) => state.filters);

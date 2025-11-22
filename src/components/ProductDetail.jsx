@@ -5,9 +5,8 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import {
   fetchProductById,
-  clearSelectedProduct,
-  setSelectedProduct,
-} from "../app/features/products/productsSlice";
+  clearProductDetail,
+} from "../app/features/products/productDetailSlice";
 import { selectIsAuthenticated, selectIsBuyer } from "../app/features/auth/authSlice";
 import { addItemToCart } from "../app/features/cart/cartSlice";
 
@@ -15,11 +14,10 @@ const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const {
-    products,
-    selectedProduct: product,
-    selectedProductStatus: status,
-    selectedProductError: error,
-  } = useSelector((state) => state.products);
+    detail: product,
+    status,
+    error,
+  } = useSelector((state) => state.productDetail);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isBuyer = useSelector(selectIsBuyer);
@@ -40,7 +38,7 @@ const ProductDetail = () => {
     dispatch(fetchProductById(id));
 
     return () => {
-      dispatch(clearSelectedProduct());
+      dispatch(clearProductDetail());
     };
   }, [id, dispatch]);
 

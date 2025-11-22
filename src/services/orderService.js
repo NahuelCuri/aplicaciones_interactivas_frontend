@@ -19,7 +19,7 @@ const updateCartItemQuantity = (productId, quantity) => {
 };
 
 const getOrdersByUser = (buyerId) => {
-  return api.get(`/users/${buyerId}/orders`);
+  return api.get(`${API_URL}/users/${buyerId}/orders`);
 };
 
 const checkout = () => {

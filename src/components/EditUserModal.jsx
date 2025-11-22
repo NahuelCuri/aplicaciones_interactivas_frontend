@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const EditUserModal = ({ user, onClose, onSave }) => {
   const [username, setUsername] = useState(user.username);

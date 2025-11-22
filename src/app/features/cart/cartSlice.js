@@ -48,10 +48,13 @@ export const updateCartItemQuantity = createAsyncThunk('cart/updateCartItemQuant
   }
 });
 
+import { invalidateOrders } from '../orders/orderSlice';
+
 export const checkoutCart = createAsyncThunk('cart/checkout', async (_, { dispatch, rejectWithValue }) => {
     try {
         const order = await orderService.checkout();
         await dispatch(fetchCart());
+        dispatch(invalidateOrders());
         return order.data;
     } catch (error) {
         return rejectWithValue(error.response.data);
@@ -92,7 +95,7 @@ const cartSlice = createSlice({
       .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
         state.cart = action.payload;
       })
-      .addCase(checkoutCart.fulfilled, (state, action) => {
+      .addCase(checkoutCart.fulfilled, (state) => {
         // The fetchCart call in the thunk will update the state, but we can clear it here for an immediate UI response if needed
         state.cart = null;
       });

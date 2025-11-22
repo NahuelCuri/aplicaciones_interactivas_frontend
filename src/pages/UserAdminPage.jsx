@@ -5,22 +5,36 @@ import {
   updateUser,
   deleteUser,
 } from "../app/features/users/userSlice";
+import { fetchRoles } from "../app/features/roles/roleSlice";
 import EditUserModal from "../components/EditUserModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 const UserAdminPage = () => {
   const dispatch = useDispatch();
-  const { users, status, error } = useSelector((state) => state.users);
+  const { users, status: userStatus, error: userError } = useSelector((state) => state.users);
+  const { roles, status: roleStatus, error: roleError } = useSelector((state) => state.roles);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    if (status === "idle") {
+    if (userStatus === "idle") {
       dispatch(fetchUsers());
     }
-  }, [status, dispatch]);
+  }, [userStatus, dispatch]);
+
+  useEffect(() => {
+    if (roleStatus === "idle") {
+      dispatch(fetchRoles());
+    }
+  }, [roleStatus, dispatch]);
+
+  useEffect(() => {
+    if (roleStatus === "succeeded") {
+      console.log("Roles fetched successfully:", roles);
+    }
+  }, [roles, roleStatus]);
 
   const handleEdit = (user) => {
     setSelectedUser(user);

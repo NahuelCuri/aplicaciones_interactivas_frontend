@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateProduct } from '../app/features/products/productsSlice';
+import { updateProduct } from '../app/features/products/sellerProductsSlice';
 import { fetchCategories } from '../app/features/categories/categorySlice';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';

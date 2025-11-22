@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import CartDropdown from './CartDropdown';
 import UserDropdown from './UserDropdown';
 import { useDetectOutsideClick } from '../services/useDetectOutsideClick';
-import { useState } from 'react';
 import { selectIsAdmin, selectIsAuthenticated, selectIsBuyer, selectIsSeller } from '../app/features/auth/authSlice';
 import { selectCart } from '../app/features/cart/cartSlice';
 
