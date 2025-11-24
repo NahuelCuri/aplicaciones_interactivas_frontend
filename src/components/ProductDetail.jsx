@@ -7,7 +7,7 @@ import {
   fetchProductById,
   clearProductDetail,
 } from "../app/features/products/productDetailSlice";
-import { selectIsAuthenticated, selectIsBuyer } from "../app/features/auth/authSlice";
+import { selectIsAuthenticated, selectIsBuyer, selectUser } from "../app/features/auth/authSlice";
 import { addItemToCart } from "../app/features/cart/cartSlice";
 
 const ProductDetail = () => {
@@ -22,6 +22,8 @@ const ProductDetail = () => {
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isBuyer = useSelector(selectIsBuyer);
+  const user = useSelector(selectUser);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -75,8 +77,11 @@ const ProductDetail = () => {
       </div>
     );
   }
-
-  const canAddToCart = isAuthenticated && isBuyer;
+console.log("Logged In User:", user); 
+  console.log("Product Seller ID:", product?.sellerId);
+  console.log("Do IDs match?", user?.id === product?.sellerId);
+  const isOwner = user && product && user.id === product.sellerId;
+  const canAddToCart = isAuthenticated && isBuyer && !isOwner;
 
   const customStyles = `
     .carousel .thumbs-wrapper {
@@ -118,7 +123,6 @@ const ProductDetail = () => {
       <style>{customStyles}</style>
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* IMAGES */}
           <div>
             <div className="mb-4">
               <nav aria-label="Breadcrumb" className="flex">
@@ -183,7 +187,6 @@ const ProductDetail = () => {
             </Carousel>
           </div>
 
-          {/* INFO */}
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {product.name}
@@ -232,20 +235,22 @@ const ProductDetail = () => {
               className={`w-full text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2 ${
                 canAddToCart
                   ? "bg-primary hover:bg-primary/90 cursor-pointer"
-                  : "bg-primary/50 cursor-not-allowed"
+                  : "bg-gray-400 cursor-not-allowed"
               }`}
               disabled={product.stock === 0 || !canAddToCart}
               onClick={handleAddToCart}
             >
               <span className="material-symbols-outlined">
-                add_shopping_cart
+                {isOwner ? "block" : "add_shopping_cart"}
               </span>
               <span>
-                {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                {isOwner 
+                  ? "You own this product" 
+                  : product.stock > 0 ? "Add to Cart" : "Out of Stock"}
               </span>
             </button>
-            {!canAddToCart && (
-              <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt.4">
+            {!isAuthenticated && (
+              <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
                 Don't have an account?{" "}
                 <Link
                   to="/register"
@@ -255,6 +260,12 @@ const ProductDetail = () => {
                 </Link>{" "}
                 to start shopping!
               </p>
+            )}
+            
+            {isOwner && (
+               <p className="text-center text-sm text-red-500 mt-2 font-medium">
+                 Sellers cannot purchase their own products.
+               </p>
             )}
           </div>
         </div>

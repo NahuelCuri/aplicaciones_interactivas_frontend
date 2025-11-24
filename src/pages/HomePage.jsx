@@ -19,8 +19,6 @@ const HomePage = () => {
   const pageSize = 10;
 
   useEffect(() => {
-    // Only fetch products if the list is empty. This loads initial data 
-    // efficiently and relies on Redux for all subsequent updates.
     if (allProducts.length === 0) {
       dispatch(fetchProducts());
     }
@@ -42,7 +40,6 @@ const HomePage = () => {
     return byName && byCategory && byPrice;
   });
 
-  // 🔹 calcular productos visibles según la página
   const indexOfLast = currentPage * pageSize;
   const indexOfFirst = indexOfLast - pageSize;
   const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
@@ -68,6 +65,9 @@ const HomePage = () => {
                   finalPrice={product.finalPrice}
                   categoryName={product.categoryName}
                   mainImage={mainImage}
+                  
+                  // 👇 ADD THIS LINE 👇
+                  sellerId={product.sellerId} 
                 />
               )
             })}
