@@ -18,6 +18,7 @@ const ProductDetail = () => {
     status,
     error,
   } = useSelector((state) => state.productDetail);
+  const { entities: images } = useSelector((state) => state.images);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isBuyer = useSelector(selectIsBuyer);
@@ -161,11 +162,11 @@ const ProductDetail = () => {
               useKeyboardArrows={true}
               autoPlay={true}
             >
-              {product.images && product.images.length > 0 ? (
-                product.images.map((image, index) => (
-                  <div key={index} onClick={() => openModal(image.content)}>
+              {product.imageIds && product.imageIds.length > 0 ? (
+                product.imageIds.map((imageId, index) => (
+                  <div key={index} onClick={() => openModal(images[imageId])}>
                     <img
-                      src={`data:image/jpeg;base64,${image.content}`}
+                      src={images[imageId]}
                       alt={`Product image ${index + 1}`}
                       className="h-96 w-full object-contain cursor-pointer"
                     />
@@ -268,7 +269,7 @@ const ProductDetail = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={`data:image/jpeg;base64,${selectedImage}`}
+              src={selectedImage}
               alt="Enlarged product"
               className="w-full h-full object-contain"
             />

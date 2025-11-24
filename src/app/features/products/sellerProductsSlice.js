@@ -1,9 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '../../../services/productService';
+import { fetchImagesByProductId } from '../images/imageSlice';
 
 // Thunks for seller products
-export const fetchSellerProducts = createAsyncThunk('sellerProducts/fetch', async () => {
+export const fetchSellerProducts = createAsyncThunk('sellerProducts/fetch', async (_, { dispatch }) => {
   const response = await productService.getSellerProducts();
+  if (response.data) {
+    for (const product of response.data) {
+      if (product.imageIds && product.imageIds.length > 0) {
+        await dispatch(fetchImagesByProductId(product.id));
+      }
+    }
+  }
   return response.data;
 });
 
@@ -12,10 +20,14 @@ export const searchSellerProducts = createAsyncThunk('sellerProducts/search', as
   return response.data;
 });
 
-export const createProduct = createAsyncThunk('sellerProducts/create', async (productData, { getState }) => {
+export const createProduct = createAsyncThunk('sellerProducts/create', async (productData, { getState, dispatch }) => {
   const response = await productService.createProduct(productData);
   const newProductDetail = response.data;
   
+  if (newProductDetail && newProductDetail.id) {
+    await dispatch(fetchImagesByProductId(newProductDetail.id));
+  }
+
   const { categories } = getState().categories;
   const category = categories.find(cat => cat.id == newProductDetail.categoryId);
   const categoryName = category ? category.name : 'Unknown';
@@ -26,9 +38,33 @@ export const createProduct = createAsyncThunk('sellerProducts/create', async (pr
   };
 });
 
-export const updateProduct = createAsyncThunk('sellerProducts/update', async ({ id, data }) => {
+export const updateProduct = createAsyncThunk('sellerProducts/update', async ({ id, data }, { dispatch }) => {
+  // 1. Perform the update on the backend
   const response = await productService.updateProduct(id, data);
-  return response.data;
+  let updatedProduct = response.data;
+
+  if (updatedProduct) {
+    // 2. Fetch the images immediately. 
+    // We capture the 'action' returned by the dispatch to access the payload.
+    const imageResultAction = await dispatch(fetchImagesByProductId(updatedProduct.id));
+
+    // 3. Check if the image fetch was successful
+    if (fetchImagesByProductId.fulfilled.match(imageResultAction)) {
+      const fetchedImages = imageResultAction.payload; // This is the array of actual image objects
+      
+      // 4. EXTRACT the fresh IDs from the images we just fetched
+      const freshImageIds = fetchedImages.map(img => img.id);
+
+      // 5. Override the product's imageIds with these fresh IDs.
+      // This ensures the Product List slice points to the exact same IDs that are now in the Images slice.
+      updatedProduct = {
+        ...updatedProduct,
+        imageIds: freshImageIds
+      };
+    }
+  }
+  
+  return updatedProduct;
 });
 
 export const deleteProduct = createAsyncThunk('sellerProducts/delete', async (productId) => {
@@ -74,22 +110,13 @@ const sellerProductsSlice = createSlice({
       // CRUD operations
       .addCase(createProduct.fulfilled, (state, action) => {
         const newProductDetail = action.payload;
-        // Transform the detailed DTO into a list DTO if necessary
-        const newProductList = {
-          ...newProductDetail,
-          mainImageBase64: newProductDetail.images?.[0]?.content || null,
-        };
-        state.list.push(newProductList);
+        state.list.push(newProductDetail);
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         const updatedProductDetail = action.payload;
-        const updatedProductList = {
-          ...updatedProductDetail,
-          mainImageBase64: updatedProductDetail.images?.[0]?.content || null,
-        };
-        const index = state.list.findIndex(p => p.id === updatedProductList.id);
+        const index = state.list.findIndex(p => p.id === updatedProductDetail.id);
         if (index !== -1) {
-          state.list[index] = updatedProductList;
+          state.list[index] = updatedProductDetail;
         }
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {

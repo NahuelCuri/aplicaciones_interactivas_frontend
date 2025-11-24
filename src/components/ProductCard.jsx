@@ -1,11 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-const ProductCard = ({ id, name, finalPrice, categoryName, mainImageBase64 }) => {
+const ProductCard = ({ id, name, finalPrice, categoryName, mainImage }) => {
   const navigate = useNavigate();
 
-  const imageSrc = mainImageBase64
-    ? `data:image/jpeg;base64,${mainImageBase64}`
-    : "https://via.placeholder.com/300x300?text=No+Image";
+  const imageSrc = mainImage ? mainImage : "https://via.placeholder.com/300x300?text=No+Image";
 
   return (
     <div

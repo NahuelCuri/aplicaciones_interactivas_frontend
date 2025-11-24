@@ -1,9 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '../../../services/productService';
+import { fetchImagesByProductId } from '../images/imageSlice';
 
 // Thunk for single product
-export const fetchProductById = createAsyncThunk('productDetail/fetchById', async (productId) => {
+export const fetchProductById = createAsyncThunk('productDetail/fetchById', async (productId, { dispatch }) => {
     const response = await productService.getProductById(productId);
+    if (response.data) {
+        dispatch(fetchImagesByProductId(response.data.id));
+    }
     return response.data;
 });
 

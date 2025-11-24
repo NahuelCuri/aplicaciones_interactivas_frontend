@@ -9,6 +9,7 @@ import authReducer, { logout } from './features/auth/authSlice';
 import cartReducer from './features/cart/cartSlice';
 import orderReducer from './features/orders/orderSlice';
 import rolesReducer from './features/roles/roleSlice';
+import imagesReducer from './features/images/imageSlice';
 import { notificationsListenerMiddleware } from './middleware/notificationsMiddleware';
 import api from '../services/api';
 
@@ -23,16 +24,18 @@ const appReducer = combineReducers({
   cart: cartReducer,
   orders: orderReducer,
   roles: rolesReducer,
+  images: imagesReducer,
 });
 
 const rootReducer = (state, action) => {
   if (action.type === 'auth/logout') {
     // On logout, create a new state.
-    const { products, categories, roles } = state;
+    const { products, categories, roles, images } = state; // Include images here
     state = {
       // Keep fully public slices
       categories,
       roles,
+      images, // Preserve images state
       // For the products slice, keep public data but reset user-specific data
       products: {
         ...productsInitialState,

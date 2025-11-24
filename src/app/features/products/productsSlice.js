@@ -1,10 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '../../../services/productService';
 import { createProduct } from './sellerProductsSlice';
+import { fetchImagesByProductId } from '../images/imageSlice';
 
 // Thunk for all products
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
+export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { dispatch }) => {
   const response = await productService.getAllProducts();
+  if (response.data) {
+    response.data.forEach(product => {
+      if (product.imageIds && product.imageIds.length > 0) {
+        dispatch(fetchImagesByProductId(product.id));
+      }
+    });
+  }
   return response.data;
 });
 
@@ -36,14 +44,9 @@ const productsSlice = createSlice({
       // When a seller creates a product, add it to the main product list
       .addCase(createProduct.fulfilled, (state, action) => {
         const newProductDetail = action.payload;
-        // This transformation logic is similar to sellerProductsSlice to ensure consistency
-        const newProductList = {
-          ...newProductDetail,
-          mainImageBase64: newProductDetail.images?.[0]?.content || null,
-        };
         // Add the new product to the beginning of the list for immediate visibility
         if (state.status === 'succeeded') {
-          state.list.unshift(newProductList);
+          state.list.unshift(newProductDetail);
         }
         // If the list hasn't been fetched yet, we don't need to add it,
         // as it will be included in the next fetch.

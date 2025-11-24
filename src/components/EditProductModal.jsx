@@ -8,9 +8,10 @@ import { Carousel } from 'react-responsive-carousel';
 const EditProductModal = ({ product, onClose }) => {
   const dispatch = useDispatch();
   const { categories, status: categoriesStatus } = useSelector(state => state.categories);
+  const { entities: images } = useSelector(state => state.images); // Get normalized images
   const [formData, setFormData] = useState(product);
   const [newImages, setNewImages] = useState([]);
-  const [imagesToDelete, setImagesToDelete] = useState([]);
+  const [imageIdsToDelete, setImageIdsToDelete] = useState([]); // Renamed for clarity
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -18,18 +19,20 @@ const EditProductModal = ({ product, onClose }) => {
     if (categoriesStatus === 'idle') {
       dispatch(fetchCategories());
     }
-    const productCategory = categories.find(cat => cat.name === product.categoryName);
-    if (productCategory) {
-      setFormData(prev => ({ ...prev, categoryId: productCategory.id }));
-    }
+    // Set initial form data
+    setFormData(prev => {
+      const updatedProduct = { ...product };
+      // Ensure categoryId is correctly set for the form
+      if (product.categoryId) {
+        updatedProduct.categoryId = product.categoryId;
+      }
+      return updatedProduct;
+    });
+
     return () => {
       newImages.forEach(file => URL.revokeObjectURL(file.preview));
     };
-  }, [product.categoryName, newImages, categoriesStatus, dispatch, categories]);
-
-  useEffect(() => {
-    setFormData(product);
-  }, [product]);
+  }, [product, newImages, categoriesStatus, dispatch, categories]); // Depend on product to re-initialize form data if product changes
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,15 +42,6 @@ const EditProductModal = ({ product, onClose }) => {
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setNewImages(prev => [...prev, ...files]);
-  };
-
-  const handleImageUploadClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleDeleteImage = (imageId) => {
-    setImagesToDelete([...imagesToDelete, imageId]);
-    setFormData(prev => ({ ...prev, images: prev.images.filter(img => img.id !== imageId) }));
   };
 
   const handleDragOver = (e) => {
@@ -67,8 +61,13 @@ const EditProductModal = ({ product, onClose }) => {
     setNewImages(prev => [...prev, ...files]);
   };
 
-  const handleRemoveNewImage = (index) => {
-    setNewImages(prev => prev.filter((_, i) => i !== index));
+  const handleImageUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleRemoveNewImage = (imageId) => {
+    setNewImages(prev => prev.filter(file => URL.createObjectURL(file) !== imageId));
+    setDisplayedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   const handleSaveChanges = async () => {
@@ -84,7 +83,7 @@ const EditProductModal = ({ product, onClose }) => {
       productData.append('newImages', image);
     });
 
-    imagesToDelete.forEach(imageId => {
+    imageIdsToDelete.forEach(imageId => {
       productData.append('imagesToDelete', imageId);
     });
 
@@ -98,8 +97,34 @@ const EditProductModal = ({ product, onClose }) => {
 
   if (!product) return null;
 
-  const allImages = [...(formData.images || []), ...newImages];
-  const carouselKey = allImages.length;
+  const [displayedImages, setDisplayedImages] = useState([]);
+
+  useEffect(() => {
+    if (product.imageIds && images) {
+      const existingProductImageObjects = product.imageIds
+        .filter(id => images[id]) // Filter out any imageIds that haven't been loaded yet
+        .map(id => ({ id: id, content: images[id] })); // Create temporary objects for display
+      setDisplayedImages([...existingProductImageObjects, ...newImages.map(file => ({
+        id: URL.createObjectURL(file), // Use a URL as a temporary ID for new files
+        content: URL.createObjectURL(file),
+        file: file // Store the actual file object for FormData
+      }))]);
+    } else {
+      setDisplayedImages(newImages.map(file => ({
+        id: URL.createObjectURL(file),
+        content: URL.createObjectURL(file),
+        file: file
+      })));
+    }
+    return () => {
+      newImages.forEach(file => URL.revokeObjectURL(file.preview));
+      displayedImages.forEach(img => {
+        if (img.content.startsWith('blob:')) { // Revoke object URLs for temporary new images
+          URL.revokeObjectURL(img.content);
+        }
+      });
+    };
+  }, [product.imageIds, images, newImages]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -172,17 +197,20 @@ const EditProductModal = ({ product, onClose }) => {
                   <input ref={fileInputRef} onChange={handleFileChange} className="hidden" id="dropzone-file" multiple type="file" />
                 </div>
               </div>
-              <Carousel key={carouselKey} showArrows={true} showThumbs={false} infiniteLoop={true} useKeyboardArrows={true}>
-                {allImages.map((image, index) => {
-                  const isExistingImage = index < (formData.images || []).length;
-                  const imageId = isExistingImage ? image.id : index - (formData.images || []).length;
-                  const imageUrl = isExistingImage ? `data:image/jpeg;base64,${image.content}` : URL.createObjectURL(image);
-
+              <Carousel key={displayedImages.length} showArrows={true} showThumbs={false} infiniteLoop={true} useKeyboardArrows={true}>
+                {displayedImages.map((image, index) => {
                   return (
-                    <div key={index} className="relative group">
-                      <img alt={`Product image ${index}`} className="h-24 w-full object-cover rounded-lg" src={imageUrl} />
+                    <div key={image.id || index} className="relative group">
+                      <img alt={`Product image ${index}`} className="h-24 w-full object-cover rounded-lg" src={image.content} />
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                        <button onClick={() => isExistingImage ? handleDeleteImage(image.id) : handleRemoveNewImage(imageId)} className="text-white">
+                        <button onClick={() => {
+                           if (product.imageIds && product.imageIds.includes(image.id)) { // Existing image
+                             setImageIdsToDelete(prev => [...prev, image.id]);
+                             setDisplayedImages(prev => prev.filter(img => img.id !== image.id));
+                           } else { // New image
+                             handleRemoveNewImage(image.id);
+                           }
+                         }} className="text-white">
                           <span className="material-symbols-outlined">delete</span>
                         </button>
                       </div>

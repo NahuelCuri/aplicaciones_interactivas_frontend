@@ -9,6 +9,7 @@ import { setFilter } from "../app/features/filters/filterSlice";
 const HomePage = () => {
   const dispatch = useDispatch();
   const allProducts = useSelector((state) => state.products.list);
+  const { entities: images } = useSelector((state) => state.images);
   const productStatus = useSelector((state) => state.products.status);
   const error = useSelector((state) => state.products.error);
   const filters = useSelector((state) => state.filters);
@@ -57,16 +58,19 @@ const HomePage = () => {
       content = (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {currentProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                finalPrice={product.finalPrice}
-                categoryName={product.categoryName}
-                mainImageBase64={product.mainImageBase64}
-              />
-            ))}
+            {currentProducts.map((product) => {
+              const mainImage = product.imageIds && product.imageIds.length > 0 ? images[product.imageIds[0]] : null;
+              return (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  finalPrice={product.finalPrice}
+                  categoryName={product.categoryName}
+                  mainImage={mainImage}
+                />
+              )
+            })}
           </div>
           <Pagination
             currentPage={currentPage}

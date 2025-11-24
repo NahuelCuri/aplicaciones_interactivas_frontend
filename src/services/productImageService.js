@@ -17,6 +17,10 @@ const getImagesByProduct = (productId) => {
   return api.get(`${API_URL}/product/${productId}`);
 };
 
+const getImageById = (imageId) => {
+    return api.get(`${API_URL}/${imageId}`, { responseType: 'blob' });
+}
+
 const deleteImage = (imageId) => {
   return api.delete(`${API_URL}/${imageId}`);
 };
@@ -25,6 +29,7 @@ const productImageService = {
   addImageToProduct,
   getImagesByProduct,
   deleteImage,
+  getImageById,
 };
 
 export default productImageService;
