@@ -123,9 +123,9 @@ const ProductDetail = () => {
               <nav aria-label="Breadcrumb" className="flex">
                 <ol className="flex items-center space-x-2 text-sm" role="list">
                   <li>
-                    <a className="text-gray-500 hover:text-primary" href="/">
+                    <Link className="text-gray-500 hover:text-primary" to="/">
                       Home
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <div className="flex items-center">

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import TextInput from './TextInput';
-import { loginUser, selectAuthError, selectAuthIsLoading, selectUser } from '../app/features/auth/authSlice';
+import { loginUser, clearAuthError, selectAuthError, selectAuthIsLoading, selectUser } from '../app/features/auth/authSlice';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -38,6 +38,12 @@ const LoginForm = () => {
       }
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearAuthError());
+    };
+  }, [dispatch]);
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit} noValidate>

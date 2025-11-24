@@ -86,15 +86,6 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
       // The other thunks just trigger a fetch, so we only need to handle fetchCart's lifecycle
-      .addCase(addItemToCart.fulfilled, (state, action) => {
-        state.cart = action.payload;
-      })
-      .addCase(removeItemFromCart.fulfilled, (state, action) => {
-        state.cart = action.payload;
-      })
-      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
-        state.cart = action.payload;
-      })
       .addCase(checkoutCart.fulfilled, (state) => {
         // The fetchCart call in the thunk will update the state, but we can clear it here for an immediate UI response if needed
         state.cart = null;

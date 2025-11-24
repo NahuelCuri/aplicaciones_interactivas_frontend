@@ -1,10 +1,16 @@
+import { useEffect } from 'react';
 import CartItem from "../components/CartItem";
 import OrderSummary from "../components/OrderSummary";
-import { useSelector } from "react-redux";
-import { selectCart } from "../app/features/cart/cartSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCart, fetchCart } from "../app/features/cart/cartSlice";
 
 const CartPage = () => {
+  const dispatch = useDispatch();
   const cart = useSelector(selectCart);
+
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col">

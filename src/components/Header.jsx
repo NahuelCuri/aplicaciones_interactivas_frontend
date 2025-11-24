@@ -24,7 +24,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-10 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm shadow-sm">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white" to="/">

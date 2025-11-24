@@ -44,6 +44,9 @@ export const loginUser = createAsyncThunk('auth/login', async ({ email, password
     const user = getUserFromToken(access_token);
     return { user, token: access_token };
   } catch (err) {
+    if (err.response && err.response.status === 403) {
+      return rejectWithValue('Invalid email or password.');
+    }
     const message = err.response?.data?.message || err.message || 'Failed to log in';
     return rejectWithValue(message);
   }
@@ -84,6 +87,9 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.error = null;
+    },
+    clearAuthError: (state) => {
       state.error = null;
     },
   },
@@ -143,7 +149,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearAuthError } = authSlice.actions;
 
 // Selectors
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;

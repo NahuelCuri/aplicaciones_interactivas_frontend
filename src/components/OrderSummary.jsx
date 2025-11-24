@@ -3,19 +3,22 @@ import { useNavigate } from 'react-router-dom';
 const OrderSummary = ({ cart }) => {
   const navigate = useNavigate();
   
+  // An item is unavailable if the product is deleted or if the stock is insufficient
+  const isItemUnavailable = (item) => item.product.deleted || item.product.stock < item.quantity;
+
   // Calculate subtotal only from available items
   const subtotal = cart?.items?.reduce((acc, item) => {
-    return item.product.deleted ? acc : acc + item.priceAtPurchase * item.quantity;
+    return isItemUnavailable(item) ? acc : acc + item.priceAtPurchase * item.quantity;
   }, 0) || 0;
   
   const shipping = 0;
   const total = subtotal + shipping;
 
-  // Check if any item in the cart is deleted
-  const hasDeletedItems = cart?.items?.some(item => item.product.deleted) || false;
+  // Check if any item in the cart is unavailable
+  const hasUnavailableItems = cart?.items?.some(isItemUnavailable) || false;
 
   const handleCheckout = () => {
-    if (hasDeletedItems) {
+    if (hasUnavailableItems) {
       alert("Please remove unavailable items from your cart before proceeding.");
       return;
     }
@@ -40,14 +43,14 @@ const OrderSummary = ({ cart }) => {
         <span className="text-gray-900 dark:text-white">Total</span>
         <span className="text-gray-900 dark:text-white">${total.toFixed(2)}</span>
       </div>
-      {hasDeletedItems && (
+      {hasUnavailableItems && (
         <p className="mt-4 text-sm text-red-600">
           Some items in your cart are no longer available. Please remove them to proceed.
         </p>
       )}
       <button
         onClick={handleCheckout}
-        disabled={hasDeletedItems}
+        disabled={hasUnavailableItems}
         className="mt-6 w-full flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-bold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
         Proceed to Checkout
