@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productImageService from '../../../services/productImageService';
+import { deleteProduct } from '../products/sellerProductsSlice';
 
 const blobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
@@ -77,6 +78,16 @@ const imagesSlice = createSlice({
       .addCase(fetchImagesByProductId.rejected, (state, action) => {
         state.loading = 'idle';
         state.error = action.error.message;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        const { imageIds } = action.payload; 
+        
+        if (imageIds && imageIds.length > 0) {
+          imageIds.forEach((id) => {
+
+            delete state.entities[id];
+          });
+        }
       });
   },
 });

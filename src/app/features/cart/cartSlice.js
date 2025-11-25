@@ -3,11 +3,10 @@ import orderService from '../../../services/orderService';
 
 const initialState = {
   cart: null,
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: 'idle', 
   error: null,
 };
 
-// Async Thunks
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {
   try {
     const response = await orderService.getCart();
@@ -20,7 +19,6 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWi
 export const addItemToCart = createAsyncThunk('cart/addItemToCart', async ({ productId, quantity }, { dispatch, rejectWithValue }) => {
   try {
     await orderService.addItemToCart(productId, quantity);
-    // After adding, fetch the updated cart
     const updatedCart = await dispatch(fetchCart());
     return updatedCart.payload;
   } catch (error) {
@@ -85,9 +83,7 @@ const cartSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       })
-      // The other thunks just trigger a fetch, so we only need to handle fetchCart's lifecycle
       .addCase(checkoutCart.fulfilled, (state) => {
-        // The fetchCart call in the thunk will update the state, but we can clear it here for an immediate UI response if needed
         state.cart = null;
       });
   },
@@ -95,7 +91,6 @@ const cartSlice = createSlice({
 
 export const { clearCart } = cartSlice.actions;
 
-// Selectors
 export const selectCart = (state) => state.cart.cart;
 export const selectCartStatus = (state) => state.cart.status;
 export const selectCartError = (state) => state.cart.error;

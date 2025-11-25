@@ -8,14 +8,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        "primary": "#4F46E5", // Updated to match toast design
-        "success": "#10B981", // Added for toast design
-        "error": "#EF4444", // Added for toast design
-        "surface": "#FFFFFF", // Added for toast design
-        "text-primary": "#1F2937", // Added for toast design
-        "text-secondary": "#6B7280", // Added for toast design
+        "primary": "#4F46E5", 
+        "success": "#10B981", 
+        "error": "#EF4444", 
+        "surface": "#FFFFFF", 
+        "text-primary": "#1F2937", 
+        "text-secondary": "#6B7280", 
 
-        // Preserving existing project colors
+        
         "background-light": "#f6f6f8",
         "background-dark": "#131121",
         "foreground-light": "#131121",

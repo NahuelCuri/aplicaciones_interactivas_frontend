@@ -4,7 +4,7 @@ import ToastNotification from '../components/ToastNotification';
 
 export const showSuccessToast = (title, message) => {
   toast(<ToastNotification type="success" title={title} message={message} />, {
-    progressClassName: 'Toastify__progress-bar--info', // Use info class for primary color
+    progressClassName: 'Toastify__progress-bar--info', 
   });
 };
 

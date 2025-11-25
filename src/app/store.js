@@ -29,22 +29,17 @@ const appReducer = combineReducers({
 
 const rootReducer = (state, action) => {
   if (action.type === 'auth/logout') {
-    // On logout, create a new state.
-    const { products, categories, roles, images } = state; // Include images here
+    const { products, categories, roles, images } = state; 
     state = {
-      // Keep fully public slices
       categories,
       roles,
-      images, // Preserve images state
-      // For the products slice, keep public data but reset user-specific data
+      images, 
       products: {
         ...productsInitialState,
         list: products.list,
         status: products.status,
       },
     };
-    // Slices not defined in the new state object (auth, cart, users, filters, productDetail, sellerProducts)
-    // will be reset to their initial state by the appReducer.
   }
   return appReducer(state, action);
 };
@@ -55,7 +50,6 @@ export const store = configureStore({
     getDefaultMiddleware().concat(notificationsListenerMiddleware.middleware),
 });
 
-// Setup interceptors after store is created
 api.interceptors.request.use(
   (config) => {
     const token = store.getState().auth.token;

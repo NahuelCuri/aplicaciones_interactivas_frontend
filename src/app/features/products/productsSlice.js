@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '../../../services/productService';
-import { createProduct } from './sellerProductsSlice';
+import { createProduct, updateProduct, deleteProduct } from './sellerProductsSlice';
 import { fetchImagesByProductId } from '../images/imageSlice';
 
-// Thunk for all products
+
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { dispatch }) => {
   const response = await productService.getAllProducts();
   if (response.data) {
@@ -18,7 +18,7 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_
 
 export const initialState = {
   list: [],
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: 'idle', 
   error: null,
 };
 
@@ -29,7 +29,6 @@ const productsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Reducers for public products
       .addCase(fetchProducts.pending, (state) => {
         state.status = 'loading';
       })
@@ -41,15 +40,22 @@ const productsSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
       })
-      // When a seller creates a product, add it to the main product list
       .addCase(createProduct.fulfilled, (state, action) => {
         const newProductDetail = action.payload;
-        // Add the new product to the beginning of the list for immediate visibility
         if (state.status === 'succeeded') {
           state.list.unshift(newProductDetail);
         }
-        // If the list hasn't been fetched yet, we don't need to add it,
-        // as it will be included in the next fetch.
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        const deletedId = action.payload.id; 
+        state.list = state.list.filter(product => product.id !== deletedId);
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        const updatedProduct = action.payload;
+        const index = state.list.findIndex(p => p.id === updatedProduct.id);
+        if (index !== -1) {
+          state.list[index] = updatedProduct;
+        }
       });
   },
 });

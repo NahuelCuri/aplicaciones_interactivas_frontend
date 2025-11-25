@@ -10,7 +10,7 @@ const rolesSlice = createSlice({
   name: 'roles',
   initialState: {
     roles: [],
-    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+    status: 'idle', 
     error: null,
   },
   reducers: {},

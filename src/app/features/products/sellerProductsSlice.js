@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '../../../services/productService';
 import { fetchImagesByProductId } from '../images/imageSlice';
 
-// Thunks for seller products
 export const fetchSellerProducts = createAsyncThunk('sellerProducts/fetch', async (_, { dispatch }) => {
   const response = await productService.getSellerProducts();
   if (response.data) {
@@ -39,24 +38,17 @@ export const createProduct = createAsyncThunk('sellerProducts/create', async (pr
 });
 
 export const updateProduct = createAsyncThunk('sellerProducts/update', async ({ id, data }, { dispatch }) => {
-  // 1. Perform the update on the backend
   const response = await productService.updateProduct(id, data);
   let updatedProduct = response.data;
 
   if (updatedProduct) {
-    // 2. Fetch the images immediately. 
-    // We capture the 'action' returned by the dispatch to access the payload.
     const imageResultAction = await dispatch(fetchImagesByProductId(updatedProduct.id));
 
-    // 3. Check if the image fetch was successful
     if (fetchImagesByProductId.fulfilled.match(imageResultAction)) {
-      const fetchedImages = imageResultAction.payload; // This is the array of actual image objects
+      const fetchedImages = imageResultAction.payload;
       
-      // 4. EXTRACT the fresh IDs from the images we just fetched
       const freshImageIds = fetchedImages.map(img => img.id);
 
-      // 5. Override the product's imageIds with these fresh IDs.
-      // This ensures the Product List slice points to the exact same IDs that are now in the Images slice.
       updatedProduct = {
         ...updatedProduct,
         imageIds: freshImageIds
@@ -67,14 +59,19 @@ export const updateProduct = createAsyncThunk('sellerProducts/update', async ({ 
   return updatedProduct;
 });
 
-export const deleteProduct = createAsyncThunk('sellerProducts/delete', async (productId) => {
+export const deleteProduct = createAsyncThunk('sellerProducts/delete', async (productId, { getState }) => {
+  const state = getState();
+  const productToDelete = state.sellerProducts.list.find(p => p.id === productId);
+  const imageIds = productToDelete ? productToDelete.imageIds : [];
+
   await productService.deleteProduct(productId);
-  return productId;
+
+  return { id: productId, imageIds };
 });
 
 const initialState = {
   list: [],
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: 'idle', 
   error: null,
 };
 
@@ -84,7 +81,6 @@ const sellerProductsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch and search
       .addCase(fetchSellerProducts.pending, (state) => {
         state.status = 'loading';
       })
@@ -107,7 +103,6 @@ const sellerProductsSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
       })
-      // CRUD operations
       .addCase(createProduct.fulfilled, (state, action) => {
         const newProductDetail = action.payload;
         state.list.push(newProductDetail);
@@ -120,7 +115,7 @@ const sellerProductsSlice = createSlice({
         }
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        const productId = action.payload;
+        const productId = action.payload.id; 
         state.list = state.list.filter(p => p.id !== productId);
       });
   },

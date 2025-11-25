@@ -19,10 +19,8 @@ const EditProductModal = ({ product, onClose }) => {
     if (categoriesStatus === 'idle') {
       dispatch(fetchCategories());
     }
-    // Set initial form data
     setFormData(prev => {
       const updatedProduct = { ...product };
-      // Ensure categoryId is correctly set for the form
       if (product.categoryId) {
         updatedProduct.categoryId = product.categoryId;
       }
@@ -32,7 +30,7 @@ const EditProductModal = ({ product, onClose }) => {
     return () => {
       newImages.forEach(file => URL.revokeObjectURL(file.preview));
     };
-  }, [product, newImages, categoriesStatus, dispatch, categories]); // Depend on product to re-initialize form data if product changes
+  }, [product, newImages, categoriesStatus, dispatch, categories]); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;

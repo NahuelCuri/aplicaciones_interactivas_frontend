@@ -3,13 +3,11 @@ import authService from '../../../services/authService';
 import userService from '../../../services/userService';
 import { jwtDecode } from 'jwt-decode';
 
-// Function to get user data from token
+
 const getUserFromToken = (token) => {
   if (token) {
     try {
       const decodedToken = jwtDecode(token);
-      // Assuming the token payload has user details directly
-      // Adjust if the payload structure is different
       const user = {
         id: decodedToken.userId,
         email: decodedToken.sub,
@@ -95,7 +93,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -114,7 +111,6 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
       })
-      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -130,7 +126,6 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Upgrade to Seller
       .addCase(upgradeToSeller.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -151,7 +146,7 @@ const authSlice = createSlice({
 
 export const { logout, clearAuthError } = authSlice.actions;
 
-// Selectors
+
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectUser = (state) => state.auth.user;
 export const selectToken = (state) => state.auth.token;

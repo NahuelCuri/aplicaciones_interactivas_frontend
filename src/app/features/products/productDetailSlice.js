@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import productService from '../../../services/productService';
 import { fetchImagesByProductId } from '../images/imageSlice';
 
-// Thunk for single product
+
 export const fetchProductById = createAsyncThunk('productDetail/fetchById', async (productId, { dispatch }) => {
     const response = await productService.getProductById(productId);
     if (response.data) {
@@ -13,7 +13,7 @@ export const fetchProductById = createAsyncThunk('productDetail/fetchById', asyn
 
 const initialState = {
   detail: null,
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: 'idle', 
   error: null,
 };
 
