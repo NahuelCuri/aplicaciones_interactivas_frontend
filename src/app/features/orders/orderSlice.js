@@ -3,7 +3,7 @@ import orderService from '../../../services/orderService';
 
 const initialState = {
   orders: [],
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: 'idle', 
   error: null,
 };
 
@@ -44,7 +44,7 @@ const orderSlice = createSlice({
 
 export const { invalidateOrders } = orderSlice.actions;
 
-// Selectors
+
 export const selectUserOrders = (state) => state.orders.orders;
 export const selectOrdersStatus = (state) => state.orders.status;
 export const selectOrdersError = (state) => state.orders.error;

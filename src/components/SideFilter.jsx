@@ -5,15 +5,12 @@ import { fetchCategories } from "../app/features/categories/categorySlice";
 const SideFilter = ({ isOpen, onClose, onFilterChange }) => {
   return (
     <>
-      {/* Overlay for mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={onClose}
         ></div>
       )}
-
-      {/* Mobile Filter */}
       <aside
         className={`transform top-0 right-0 w-72 bg-background-light dark:bg-background-dark p-6 fixed h-full overflow-auto ease-in-out transition-all duration-300 z-40 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -35,7 +32,6 @@ const SideFilter = ({ isOpen, onClose, onFilterChange }) => {
         </div>
       </aside>
 
-      {/* Desktop Filter */}
       <aside className="hidden lg:block w-full lg:w-72 flex-shrink-0">
         <div className="lg:sticky lg:top-24 space-y-6">
           <FilterContent onFilterChange={onFilterChange} />
